@@ -83,7 +83,6 @@ if (isset($_POST['edit'])) {
 ?>
 
 <body>
-<div class="bgColor">
 
     <?php require("../../navbar2.php");?>
     <div class="container">
@@ -394,11 +393,9 @@ if (isset($_POST['edit'])) {
             </div>
 
             <?php endif; ?> 
-                    
+
+            <br><br> 
             
         </div> 
     </div>
-
-    
-</div>
 </body>
