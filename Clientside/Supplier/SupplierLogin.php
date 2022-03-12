@@ -29,7 +29,7 @@ if (isset($_POST['submit'])) {
 ?>
 
 <body>
-    <?php require("../../navbar2.php");?>
+    <?php include("../../Serverside/LoginNavbar.php");?>
 
     <br><br><br>
 

@@ -83,8 +83,7 @@ if (isset($_POST['edit'])) {
 ?>
 
 <body>
-
-    <?php require("../../navbar2.php");?>
+    <?php require("ManagerNavbar.php");?>
     <div class="container">
 
     <div class="row">
