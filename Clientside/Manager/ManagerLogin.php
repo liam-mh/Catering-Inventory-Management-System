@@ -28,8 +28,6 @@ if (isset($_POST['submit'])) {
 ?>
 
 <body>
-<div class="bgColor">
-
     <?php require("../../navbar2.php");?>
 
     <br><br><br>
@@ -38,8 +36,8 @@ if (isset($_POST['submit'])) {
     <div class="row">   
 
         <div class="col-md-3"></div>
-        <div class="col-md-6">
 
+        <div class="col-md-6">
             <!-- Tabs -->
             <div class="row">
                 <div class="col" style="text-align:center">  
@@ -89,8 +87,4 @@ if (isset($_POST['submit'])) {
         </div> 
     </div>
     </div>
-
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>  
-
-</div>
 </body>

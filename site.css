@@ -129,8 +129,10 @@ html {
 
 body {
   color: white;
-  margin-bottom: 60px;
- 
+  background-position: center;
+  background-color: rgb(36,36,36);
+  background-image: linear-gradient(to bottom right, #1a1a1a, #6d2c41);
+  background-attachment: fixed;
 }
 
 .rainbow {
@@ -142,9 +144,6 @@ body {
 }
 
 
-
-
-
 .footer {
   position: absolute;
   bottom: 0;
@@ -152,15 +151,6 @@ body {
   white-space: nowrap;
   line-height: 60px;
   background-color: rgba(255, 255, 255, 0.10);
-}
-
-.full-height {
-  height: 100%;
-}
-.bgColor {
-  background-color: rgb(36,36,36);
-  background-image: linear-gradient(to bottom right, #1a1a1a, #6d2c41);
-  height: 100%;
 }
 
 .container {

@@ -29,8 +29,6 @@ if (isset($_POST['submit'])) {
 ?>
 
 <body>
-<div class="bgColor">
-
     <?php require("../../navbar2.php");?>
 
     <br><br><br>
@@ -98,8 +96,4 @@ if (isset($_POST['submit'])) {
         </div> 
     </div>
     </div>
-
-    <br><br><br><br><br><br><br><br><br><br><br><br><br><br><br><br>  
-
-</div>
 </body>
