@@ -122,7 +122,7 @@ $supplier = getSupplier();
                             <tr> 
                                 <td><?php echo $PDF[$i]['Date']?></td>                                                           
                                 <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td><?php echo $PDF[$i]['PDF_Link']?></td>                                                             
+                                <td><a href="<?php echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td>                                                             
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -168,7 +168,7 @@ $supplier = getSupplier();
                             <tr> 
                                 <td><?php echo $PDF[$i]['Date']?></td>                                                           
                                 <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td><?php echo $PDF[$i]['PDF_Link']?></td>                                                             
+                                <td><a href="<?php echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td>                                                             
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -214,7 +214,7 @@ $supplier = getSupplier();
                             <tr> 
                                 <td><?php echo $PDF[$i]['Date']?></td>                                                           
                                 <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td><?php echo $PDF[$i]['PDF_Link']?></td>                                                             
+                                <td><a href="<?php echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td>                                                                                                                          
                             </tr>
                             <?php endfor; ?>
                         </tbody>
