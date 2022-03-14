@@ -106,6 +106,34 @@ function getVegPDF () {
     return $rows_array;
 }
 
+//-------------------------------------------------------------------------------------------------------
+//----- ORDERS ------------------------------------------------------------------------------------------
+
+function getDairyOrder () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy"');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+function getMeatOrder () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Meat / Fish"');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+function getVegOrder () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Fruit / Veg"');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+
 
 
 
