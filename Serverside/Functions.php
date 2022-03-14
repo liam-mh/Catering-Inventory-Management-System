@@ -67,5 +67,46 @@ function getCurrentVegStock () {
     return $rows_array;
 }
 
+//-------------------------------------------------------------------------------------------------------
+//----- GETTING FROM SUPLLIERS --------------------------------------------------------------------------
+
+function getSupplier () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Supplier');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+
+//-------------------------------------------------------------------------------------------------------
+//----- GETTING PDFS ------------------------------------------------------------------------------------
+function getDairyPDF () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM PDF WHERE Category = "Dairy"');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+function getMeatPDF () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM PDF WHERE Category = "Meat / Fish"');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+function getVegPDF () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM PDF WHERE Category = "Fruit / Veg"');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+
+
+
 
 ?>

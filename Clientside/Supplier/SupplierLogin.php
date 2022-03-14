@@ -31,7 +31,7 @@ if (isset($_POST['submit'])) {
 <body>
     <?php include("../../Serverside/LoginNavbar.php");?>
 
-    <br><br><br>
+    <br>
 
     <div class="container">
     <div class="row">   
@@ -86,7 +86,7 @@ if (isset($_POST['submit'])) {
                         <!-- Login button and invalid login error -->
                         <p class="text-danger"><?php echo $invalid; ?></p>
                         <div class="form-group">
-                            <input class="btn btn-main" type="submit" value="LOGIN" name ="submit"></input> 
+                            <input class="btn btn-main" style="width:50%" type="submit" value="LOGIN" name ="submit"></input> 
                         </div> 
                     </form>   
                 
