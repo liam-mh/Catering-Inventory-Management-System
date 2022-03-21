@@ -5,7 +5,7 @@ function verifyManager () {
     if (!isset($_POST['Username']) or !isset($_POST['Password'])) {return;}   
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $stmt = $db->prepare('SELECT Username, Password FROM Login WHERE Username=:Username');
+    $stmt = $db->prepare('SELECT Username, Password FROM Login WHERE Username=:Username AND Password=:Password');
     $stmt->bindParam(':Username', $_POST['Username'], SQLITE3_TEXT);
     $stmt->bindParam(':Password', $_POST['Password'], SQLITE3_TEXT);
 
