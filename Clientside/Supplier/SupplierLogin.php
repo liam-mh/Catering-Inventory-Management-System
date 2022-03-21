@@ -41,11 +41,14 @@ if (isset($_POST['submit'])) {
 
             <!-- Tabs -->
             <div class="row">
-                <div class="col" style="text-align:center">  
-                    <div class="w1-tab-unselected">
-                        <a class="text-light" href="/IMS/Clientside/Manager/ManagerLogin.php">WHITE HORSE LOGIN</a>
-                    </div> 
+                <div class="col">  
+                    <form method="post">
+                        <input type="submit" value="WHITE HORSE LOGIN" class="w1-tab-unselected" name="whLogin">
+                    </form>  
                 </div>
+                <?php 
+                    if (isset($_POST['whLogin'])) {header('Location:../Manager/ManagerLogin.php');}
+                ?>
                 <div class="col" style="text-align:center">  
                     <div class="w1-tab">
                         <h>SUPPLIER LOGIN</h>
