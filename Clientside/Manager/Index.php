@@ -97,7 +97,7 @@ if (isset($_POST['edit'])) {
 
         <div class="col-md-6"></div>
 
-        <!-- Apply Tab -->
+        <!-- Apply Tab-->
         <div class="col-md-3">  
             <form method="post">
                 <input type="submit" value="APPLY" class="w1-tab-unselected" name="apply">

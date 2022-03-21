@@ -45,12 +45,18 @@ if (isset($_POST['submit'])) {
                         <h>WHITE HORSE LOGIN</h>
                     </div> 
                 </div>
-                <div class="col" style="text-align:center">  
-                    <div class="w1-tab-unselected">
-                        <a class="text-light" href="/IMS/Clientside/Supplier/SupplierLogin.php">SUPPLIER LOGIN</a>
-                    </div> 
+                <div class="col">  
+                    <form method="post">
+                        <input type="submit" value="SUPPLIER LOGIN" class="w1-tab-unselected" name="sLogin">
+                    </form>  
                 </div>
+                <?php 
+                    if (isset($_POST['sLogin'])) {header('Location:../Supplier/SupplierLogin.php');}
+                ?>
             </div>   
+
+            <!-- Apply Tab-->
+            
 
             <!-- Logins -->
             <div>
