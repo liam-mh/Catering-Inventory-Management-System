@@ -135,7 +135,7 @@ if (isset($_POST['edit'])) {
                                     <form method="post">
                                         <div class="form-group" ></div>
                                             <input type="hidden" name="dairyInput" value = "<?php $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="quantityDairyInput">
+                                            <input type="text" name="quantityDairyInput" placeholder="Insert quantity used">
                                         </div>
                                     </form>
                                 </td>                                
@@ -158,7 +158,7 @@ if (isset($_POST['edit'])) {
                                     <form method="post">
                                         <div class="form-group" ></div>
                                             <input type="hidden" name="meatInput" value = "<?php $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="quantityMeatInput">
+                                            <input type="text" name="quantityMeatInput" placeholder="Insert quantity used">
                                         </div>
                                     </form>
                                 </td>                                
@@ -181,7 +181,7 @@ if (isset($_POST['edit'])) {
                                     <form method="post">
                                         <div class="form-group" ></div>
                                             <input type="hidden" name="vegInput" value = "<?php $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="quantityVegInput">
+                                            <input type="text" name="quantityVegInput" placeholder="Insert quantity used">
                                         </div>
                                     </form>
                                 </td>                                
@@ -276,14 +276,14 @@ if (isset($_POST['edit'])) {
                     <input class="col" type="text" name="UpdateThreshold" value="<?php echo $SelectedItem[0][3]; ?>">
                 </div>
                 <div class="form-group row">
-                    <label class="control-label labelFont col">PRICE</label>
-                    <input class="col" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
+                    <label class="control-label labelFont col">PRICE £</label>
+                    <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
+                    <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
                 </div>
     
                 <!-- apply and delete button -->
                 <br>
                 <div class="row">
-                    
                     <div class="col" style="text-align:center"> 
                         <form method="post">
                             <input type="hidden" name="ItemName" value ="<?php echo $selected ?>">   
@@ -297,8 +297,8 @@ if (isset($_POST['edit'])) {
                             <input type="submit" value="DELETE" class="btn btn-danger" name="delete">
                         </form>
                     </div>
-
                 </div> 
+
             </div>
             
             <?php endif ?> 
