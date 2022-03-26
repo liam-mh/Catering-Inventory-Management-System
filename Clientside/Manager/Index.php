@@ -63,25 +63,10 @@ $result = $stmt->execute();
 $SelectedItem = [];
 while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
 
-//Updating database with 'apply' button
-if (isset($_POST['edit'])) {
-    update();
-}
-
-
-
-if (isset($_POST['delete'])){
-    
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'DELETE FROM Stock WHERE Item_Name=:ItemName';
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName',  $_GET['Selected'], SQLITE3_TEXT);
-    $stmt->execute();
-
-    header("Location:Index.php?deleted=true");
-    echo "delete function";
-
-}
+//update selected
+if (isset($_POST['edit'])) {updateSelected();}
+//delete selectd
+if (isset($_POST['delete'])){deleteSelected();}
 
 ?>
 

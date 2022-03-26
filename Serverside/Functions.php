@@ -29,7 +29,7 @@ function InsertUsed() {
 
 }
 
-function update() {
+function updateSelected() {
 
     //Unit price calculation
     $pounds = $_POST['UpdateUnitPounds'];
@@ -51,6 +51,17 @@ function update() {
     $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
     $stmt->execute();
     header('Location:Index.php?updated=true"');
+}
+
+function deleteSelected() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'DELETE FROM Stock WHERE Item_Name=:Name';
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name', $selected, SQLITE3_TEXT);
+    $stmt->execute();
+    header("Location:Index.php?deleted=true");
+
 }
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
