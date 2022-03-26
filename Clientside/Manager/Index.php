@@ -68,24 +68,6 @@ if (isset($_POST['edit'])) {
     update();
 }
 
-function update() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 
-       'UPDATE Stock 
-        SET Item_Name=:ItemName, Category=:Category, Unit_Price=:UnitPrice, Threshold=:Threshold, Quantity=:Quantity 
-        WHERE Item_Name=:Name';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',      $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':ItemName',  $_POST['UpdateItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':Category',  $_POST['UpdateCategory'], SQLITE3_TEXT);
-    $stmt->bindParam(':UnitPrice', $_POST['UpdateUnitPrice'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
-    $stmt->execute();
-    header('Location:Index.php?updated=true"');
-}
 
 
 if (isset($_POST['delete'])){
@@ -301,9 +283,15 @@ if (isset($_POST['delete'])){
                         <input class="col" type="text" name="UpdateThreshold" value="<?php echo $SelectedItem[0][3]; ?>">
                     </div>
                     <div class="form-group row">
-                        <label class="control-label labelFont col">PRICE £</label>
-                        <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
-                        <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
+                        <label class="control-label labelFont col-md-6">PRICE £</label>
+                        <?php //variables for price display
+                            $selectedPrice = $SelectedItem[0][2];
+                            $selectedPence = substr($selectedPrice, -2);
+                            $selectedPound = substr($selectedPrice, 0, -2);
+                        ?>
+                        <input class="col" type="text" name="UpdateUnitPounds" value="<?php echo $selectedPound; ?>">
+                        <div class="col-md-1">.</div>
+                        <input class="col" type="text" name="UpdateUnitPence" value="<?php echo $selectedPence; ?>">
                     </div>
         
                     <!-- apply and delete button -->
