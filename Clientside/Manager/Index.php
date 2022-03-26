@@ -33,7 +33,13 @@ function update() {
 //----- INSERT USED STOCK -------------------------------------------------------------------------------
 
 if (isset($_POST['apply'])) {
+    //dairy insert
     $insert = InsertUsed();
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'UPDATE Stock SET Quantity =:qt WHERE Item_Name =:in AND Category=:ct' ;
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':qt',$_POST[''], SQLITE3_TEXT);
+
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -79,6 +85,18 @@ if (isset($_POST['edit'])) {
     update();
 }
 
+if (isset($_POST['delete'])){
+    
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'DELETE FROM Stock WHERE Item_Name=:ItemName';
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':ItemName',  $_GET['Selected'], SQLITE3_TEXT);
+    $stmt->execute();
+
+    header("Location:Index.php?deleted=true");
+    echo "delete function";
+
+}
 
 ?>
 
@@ -266,9 +284,9 @@ if (isset($_POST['edit'])) {
                 <div class="form-group row">
                     <label class="control-label labelFont col">CATEGORY</label>
                     <select class="col" name="UpdateCategory"> 
-                        <option value="Meat / Fish" <?php echo($SelectedItem[0][4]=="Meat / Fish") ? "selected" : ""; ?> >Meat / Fish</option> 
-                        <option value="Dairy"       <?php echo($SelectedItem[0][4]=="Dairy")       ? "selected" : ""; ?> >Dairy</option> 
-                        <option value="Fruit / Veg" <?php echo($SelectedItem[0][4]=="Fruit / Veg") ? "selected" : ""; ?> >Fruit / Veg</option> 
+                        <option value="Meat / Fish" <?php echo($SelectedItem[0][1]=="Meat / Fish") ? "selected" : ""; ?> >Meat / Fish</option> 
+                        <option value="Dairy"       <?php echo($SelectedItem[0][1]=="Dairy")       ? "selected" : ""; ?> >Dairy</option> 
+                        <option value="Fruit / Veg" <?php echo($SelectedItem[0][1]=="Fruit / Veg") ? "selected" : ""; ?> >Fruit / Veg</option> 
                     </select>    
                 </div>
                 <div class="form-group row">
@@ -286,7 +304,7 @@ if (isset($_POST['edit'])) {
                 <div class="row">
                     <div class="col" style="text-align:center"> 
                         <form method="post">
-                            <input type="hidden" name="ItemName" value ="<?php echo $selected ?>">   
+                            <input type="hidden" name="ItemName" value="<?php echo $selected ?>">   
                             <input type="submit" value="APPLY" class="btn btn-main" name="edit">
                         </form>
                     </div>
