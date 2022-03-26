@@ -12,23 +12,6 @@ if (!isset($_SESSION['Username'])) {
 }
 $Name = $_SESSION['Username'];
 
-
-function update() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Stock SET Item_Name=:ItemName, Category=:Category, Unit_Price=:UnitPrice, Threshold=:Threshold, Quantity=:Quantity WHERE Item_Name=:Name' ;
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',      $_GET['Selected'], SQLITE3_TEXT);
-    $stmt->bindParam(':ItemName',  $_POST['UpdateItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':Category',  $_POST['UpdateCategory'], SQLITE3_TEXT);
-    $stmt->bindParam(':UnitPrice', $_POST['UpdateUnitPrice'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
-    $stmt->execute();
-    header('Location:Index.php?updated=true"');
-}
-
-
 //-------------------------------------------------------------------------------------------------------
 //----- INSERT USED STOCK -------------------------------------------------------------------------------
 
@@ -84,6 +67,26 @@ while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
 if (isset($_POST['edit'])) {
     update();
 }
+
+function update() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+       'UPDATE Stock 
+        SET Item_Name=:ItemName, Category=:Category, Unit_Price=:UnitPrice, Threshold=:Threshold, Quantity=:Quantity 
+        WHERE Item_Name=:Name';
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name',      $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
+    $stmt->bindParam(':ItemName',  $_POST['UpdateItemName'], SQLITE3_TEXT);
+    $stmt->bindParam(':Category',  $_POST['UpdateCategory'], SQLITE3_TEXT);
+    $stmt->bindParam(':UnitPrice', $_POST['UpdateUnitPrice'], SQLITE3_INTEGER);
+    $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
+    $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
+    $stmt->execute();
+    header('Location:Index.php?updated=true"');
+}
+
 
 if (isset($_POST['delete'])){
     
@@ -268,54 +271,60 @@ if (isset($_POST['delete'])){
                 </table>
             </div>
 
+            <!-- UPDATE SELECTED STOCK -->
+
             <?php if($_GET['Selected']!=""): ?>
 
             <div class="col-md-4 black-box">
+                
+                <form method="post">
 
-                <div class="form-group row">
-                    <label class="control-label labelFont col">NAME</label>
-                    <input class="col" type="text" name="UpdateItemName" value="<?php echo $SelectedItem[0][0]; ?>">
-                </div>
+                    <div class="form-group row">
+                        <label class="control-label labelFont col">NAME</label>
+                        <input class="col" type="text" name="UpdateItemName" value="<?php echo $SelectedItem[0][0]; ?>">
+                    </div>
 
-                <div class="form-group row">
-                    <label class="control-label labelFont col">IN STOCK</label>
-                    <input class="col" type="text" name="UpdateQuantity" value="<?php echo $SelectedItem[0][4]; ?>">
-                </div>
-                <div class="form-group row">
-                    <label class="control-label labelFont col">CATEGORY</label>
-                    <select class="col" name="UpdateCategory"> 
-                        <option value="Meat / Fish" <?php echo($SelectedItem[0][1]=="Meat / Fish") ? "selected" : ""; ?> >Meat / Fish</option> 
-                        <option value="Dairy"       <?php echo($SelectedItem[0][1]=="Dairy")       ? "selected" : ""; ?> >Dairy</option> 
-                        <option value="Fruit / Veg" <?php echo($SelectedItem[0][1]=="Fruit / Veg") ? "selected" : ""; ?> >Fruit / Veg</option> 
-                    </select>    
-                </div>
-                <div class="form-group row">
-                    <label class="control-label labelFont col">THRESHOLD</label>
-                    <input class="col" type="text" name="UpdateThreshold" value="<?php echo $SelectedItem[0][3]; ?>">
-                </div>
-                <div class="form-group row">
-                    <label class="control-label labelFont col">PRICE £</label>
-                    <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
-                    <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
-                </div>
-    
-                <!-- apply and delete button -->
-                <br>
-                <div class="row">
-                    <div class="col" style="text-align:center"> 
-                        <form method="post">
-                            <input type="hidden" name="ItemName" value="<?php echo $selected ?>">   
-                            <input type="submit" value="APPLY" class="btn btn-main" name="edit">
-                        </form>
+                    <div class="form-group row">
+                        <label class="control-label labelFont col">IN STOCK</label>
+                        <input class="col" type="text" name="UpdateQuantity" value="<?php echo $SelectedItem[0][4]; ?>">
                     </div>
-                    
-                    <div class="col" style="text-align:center"> 
-                        <form method="post">    
-                            <input type="hidden" name="selected" value ="<?php echo $selected ?>">                       
-                            <input type="submit" value="DELETE" class="btn btn-danger" name="delete">
-                        </form>
+                    <div class="form-group row">
+                        <label class="control-label labelFont col">CATEGORY</label>
+                        <select class="col" name="UpdateCategory"> 
+                            <option value="Meat / Fish" <?php echo($SelectedItem[0][1]=="Meat / Fish") ? "selected" : ""; ?> >Meat / Fish</option> 
+                            <option value="Dairy"       <?php echo($SelectedItem[0][1]=="Dairy")       ? "selected" : ""; ?> >Dairy</option> 
+                            <option value="Fruit / Veg" <?php echo($SelectedItem[0][1]=="Fruit / Veg") ? "selected" : ""; ?> >Fruit / Veg</option> 
+                        </select>    
                     </div>
-                </div> 
+                    <div class="form-group row">
+                        <label class="control-label labelFont col">THRESHOLD</label>
+                        <input class="col" type="text" name="UpdateThreshold" value="<?php echo $SelectedItem[0][3]; ?>">
+                    </div>
+                    <div class="form-group row">
+                        <label class="control-label labelFont col">PRICE £</label>
+                        <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
+                        <input class="col-md-3" type="text" name="UpdateUnitPrice" value="<?php echo $SelectedItem[0][2]; ?>">
+                    </div>
+        
+                    <!-- apply and delete button -->
+                    <br>
+                    <div class="row">
+                        <div class="col" style="text-align:center"> 
+                            <form method="post">
+                                <input type="hidden" name="SelectedUpdateItemName" value="<?php echo $_GET['Selected'] ?>">   
+                                <input type="submit" value="APPLY" class="btn btn-main" name="edit">
+                            </form>
+                        </div>
+                        
+                        <div class="col" style="text-align:center"> 
+                            <form method="post">    
+                                <input type="hidden" name="selected" value ="<?php echo $_GET['Selected'] ?>">                       
+                                <input type="submit" value="DELETE" class="btn btn-danger" name="delete">
+                            </form>
+                        </div>
+                    </div> 
+
+                </form>
 
             </div>
             
@@ -327,91 +336,90 @@ if (isset($_POST['delete'])){
 
     <!-- ADD NEW ------------------------------------------------------------------------------------>
             
-            <?php if($AddNew == TRUE): ?>
+    <?php if($AddNew == TRUE): ?>
 
-            <div class="row">
-                
-                <div class="col-md-3">  
-                    <form method="post">
-                        <input type="submit" value="CURRENT STOCK" class="w1-tab-unselected" name="CurrentStock">
-                    </form>  
+    <div class="row">
+        
+        <div class="col-md-3">  
+            <form method="post">
+                <input type="submit" value="CURRENT STOCK" class="w1-tab-unselected" name="CurrentStock">
+            </form>  
+        </div>
+
+        <div class="col-md-6"></div>
+
+        <div class="col-md-3" style="text-align:center">  
+            <div class="w1-tab">
+                <h>ADD NEW</h>
+            </div> 
+        </div>
+    </div>      
+
+    <div class="w1-box">
+        <form method="post">
+
+            <div class="row" style="text-align:center">
+                <div class="col">
+                    <h>NAME</h>
+                    <br><br>
+                    <div class="form-group">
+                        <input type="text" name="ItemName">
+                        <span class="text-danger"><?php echo $ItemNameError; ?></span>
+                    </div>
                 </div>
-
-                <div class="col-md-6"></div>
-
-                <div class="col-md-3" style="text-align:center">  
-                    <div class="w1-tab">
-                        <h>ADD NEW</h>
-                    </div> 
+                <div class="col">
+                    <h>CATEGORY</h>
+                    <br><br>
+                    <div class="form-group">
+                        <select class="col" name="Category" multiple="multiple" size=3> 
+                            <option value="Meat / Fish">Meat / Fish</option> 
+                            <option value="Dairy">      Dairy      </option> 
+                            <option value="Fruit / Veg">Fruit / Veg</option> 
+                        </select> 
+                        <span class="text-danger"><?php echo $CategoryError; ?></span>
+                    </div>
                 </div>
-            </div>      
-
-            <div class="w1-box">
-                <form method="post">
-
-                    <div class="row" style="text-align:center">
+                <div class="col">
+                    <h>UNIT PRICE £</h>
+                    <br><br>
+                    <div class="row">
+                    
                         <div class="col">
-                            <h>NAME</h>
-                            <br><br>
+                            <div class="form-group a">
+                                <input class="a" type="text" name="UnitPounds" placeholder="Pounds">
+                                <span class="text-danger"><?php echo $UnitPoundsError; ?></span>
+                            </div>
+                        </div>
+                        <div class="col">
                             <div class="form-group">
-                                <input type="text" name="ItemName">
-                                <span class="text-danger"><?php echo $ItemNameError; ?></span>
+                                <input type="text" name="UnitPence" placeholder="Pence">
+                                <span class="text-danger"><?php echo $UnitPenceError; ?></span>
                             </div>
                         </div>
-                        <div class="col">
-                            <h>CATEGORY</h>
-                            <br><br>
-                            <div class="form-group">
-                                <select class="col" name="Category" multiple="multiple" size=3> 
-                                    <option value="Meat / Fish">Meat / Fish</option> 
-                                    <option value="Dairy">Dairy</option> 
-                                    <option value="Fruit / Veg">Fruit / Veg</option> 
-                                </select> 
-                                <span class="text-danger"><?php echo $CategoryError; ?></span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <h>UNIT PRICE £</h>
-                            <br><br>
-                            <div class="row">
-                            
-                                <div class="col">
-                                    <div class="form-group a">
-                                        <input class="a" type="text" name="UnitPounds" placeholder="Pounds">
-                                        <span class="text-danger"><?php echo $UnitPoundsError; ?></span>
-                                    </div>
-                                </div>
-                                <div class="col">
-                                    <div class="form-group">
-                                        <input type="text" name="UnitPence" placeholder="Pence">
-                                        <span class="text-danger"><?php echo $UnitPenceError; ?></span>
-                                    </div>
-                                </div>
 
-                            </div>
-                        </div>
-                        <div class="col">
-                            <h>THRESHOLD</h>
-                            <br><br>
-                            <div class="form-group">
-                                <input type="text" name="Threshold">
-                                <span class="text-danger"><?php echo $ThresholdError; ?></span>
-                            </div>
-                        </div>
-                        <div class="col">
-                            <div class="form-group" style="height: 100%">
-                                <br><br>
-                                <input class="btn btn-main" type="submit" value="ADD" name="add"></input> 
-                            </div>
-                        </div>
-                    </div> 
-                </form>
-            </div>
-
-            <?php endif; ?> 
-
-            <br><br> 
-            
-        </div> 
+                    </div>
+                </div>
+                <div class="col">
+                    <h>THRESHOLD</h>
+                    <br><br>
+                    <div class="form-group">
+                        <input type="text" name="Threshold">
+                        <span class="text-danger"><?php echo $ThresholdError; ?></span>
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="form-group" style="height: 100%">
+                        <br><br>
+                        <input class="btn btn-main" type="submit" value="ADD" name="add"></input> 
+                    </div>
+                </div>
+            </div> 
+        </form>
     </div>
+
+    <?php endif; ?> 
+
+    </div><!-- container -->
+    <br><br> 
+            
 </body>
