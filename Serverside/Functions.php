@@ -28,6 +28,26 @@ function InsertUsed() {
     $stmt->execute();
 
 }
+
+function update() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+        'UPDATE Stock 
+        SET Item_Name=:ItemName, Category=:Category, Unit_Price=:UnitPrice, Threshold=:Threshold, Quantity=:Quantity 
+        WHERE Item_Name=:Name' ;
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name',      $_GET['Selected'], SQLITE3_TEXT);
+    $stmt->bindParam(':ItemName',  $_POST['UpdateItemName'], SQLITE3_TEXT);
+    $stmt->bindParam(':Category',  $_POST['UpdateCategory'], SQLITE3_TEXT);
+    $stmt->bindParam(':UnitPrice', $_POST['UpdateUnitPrice'], SQLITE3_INTEGER);
+    $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
+    $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
+    $stmt->execute();
+    header('Location:Index.php?updated=true"');
+}
+
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
 
@@ -68,7 +88,7 @@ function getCurrentVegStock () {
 }
 
 //-------------------------------------------------------------------------------------------------------
-//----- GETTING FROM SUPLLIERS --------------------------------------------------------------------------
+//----- GETTING/UPDATING SUPLLIERS ----------------------------------------------------------------------
 
 function getSupplier () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -77,6 +97,52 @@ function getSupplier () {
         $rows_array[]=$row;
     }
     return $rows_array;
+}
+
+function updateSupplierDairy() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+        'UPDATE Supplier 
+        SET Name=:DName, Email=:DEmail 
+        WHERE Category="Dairy"' ;
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':DName',   $_POST['UpdateDName'], SQLITE3_TEXT);
+    $stmt->bindParam(':DEmail',  $_POST['UpdateDEmail'], SQLITE3_TEXT);
+    
+    $stmt->execute();
+    header('Location:Suppliers.php?DairyUpdated=true"');
+}
+function updateSupplierMeat() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+        'UPDATE Supplier 
+        SET Name=:MName, Email=:MEmail 
+        WHERE Category="Meat / Fish"' ;
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':MName',   $_POST['UpdateMName'], SQLITE3_TEXT);
+    $stmt->bindParam(':MEmail',  $_POST['UpdateMEmail'], SQLITE3_TEXT);
+    
+    $stmt->execute();
+    header('Location:Suppliers.php?MeatUpdated=true"');
+}
+function updateSupplierVeg() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+        'UPDATE Supplier 
+        SET Name=:VName, Email=:VEmail 
+        WHERE Category="Fruit / Veg"' ;
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':VName',   $_POST['UpdateVName'], SQLITE3_TEXT);
+    $stmt->bindParam(':VEmail',  $_POST['UpdateVEmail'], SQLITE3_TEXT);
+    
+    $stmt->execute();
+    header('Location:Suppliers.php?VegUpdated=true"');
 }
 
 //-------------------------------------------------------------------------------------------------------
