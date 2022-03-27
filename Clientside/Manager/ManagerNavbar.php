@@ -31,7 +31,7 @@
                 <li class="nav-item nav-button">
                     <a class="nav-link text-light" href="/IMS/Serverside/Logout.php">LOGOUT</a>
                 </li>
-                <li class="nav-item nav-button-selected">
+                <li class="nav-item nav-button">
                     <a class="nav-link text-light" href="/IMS/Clientside/Manager/Index.php">HOME</a>
                 </li>
                 <li class="nav-item nav-button">
