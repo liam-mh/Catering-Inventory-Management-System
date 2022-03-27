@@ -13,25 +13,6 @@ if (!isset($_SESSION['Username'])) {
 $Name = $_SESSION['Username'];
 
 
-function update() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Stock SET Item_Name=:ItemName, Category=:Category, Unit_Price=:UnitPrice, Threshold=:Threshold, Quantity=:Quantity WHERE Item_Name=:Name' ;
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',      $_GET['Selected'], SQLITE3_TEXT);
-    $stmt->bindParam(':ItemName',  $_POST['UpdateItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':Category',  $_POST['UpdateCategory'], SQLITE3_TEXT);
-    $stmt->bindParam(':UnitPrice', $_POST['UpdateUnitPrice'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
-    $stmt->execute();
-    header('Location:Index.php?updated=true"');
-}
-
-
-//-------------------------------------------------------------------------------------------------------
-//----- INSERT USED STOCK -------------------------------------------------------------------------------
-
 if (isset($_POST['apply'])) {
     $insert = InsertUsed();
 }

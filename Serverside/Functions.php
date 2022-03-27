@@ -28,6 +28,7 @@ function InsertUsed() {
     $stmt->execute();
 
 }
+
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
 
@@ -73,6 +74,18 @@ function getCurrentVegStock () {
 function getSupplier () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Supplier');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+
+//-------------------------------------------------------------------------------------------------------
+//----- ORDERS & ORDER ITEMS ----------------------------------------------------------------------------
+
+function dairyIO () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy"');
     while ($row=$rows->fetchArray()) {
         $rows_array[]=$row;
     }
