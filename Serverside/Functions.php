@@ -18,16 +18,6 @@ function addNew() {
 
 }
 
-function InsertUsed() {
-    
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO Stock (Quantity) VALUES (:Quantity,) WHERE Item_Name = :ItemName';
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName',  $_POST['ItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity',  $_POST['Quantity'], SQLITE3_TEXT);
-    $stmt->execute();
-
-}
 
 function updateSelected() {
 
