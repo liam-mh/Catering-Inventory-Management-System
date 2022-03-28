@@ -15,14 +15,32 @@ $Name = $_SESSION['Username'];
 //-------------------------------------------------------------------------------------------------------
 //----- INSERT USED STOCK -------------------------------------------------------------------------------
 
-if (isset($_POST['apply'])) {
-    //dairy insert
-    $insert = InsertUsed();
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Stock SET Quantity =:qt WHERE Item_Name =:in AND Category=:ct' ;
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':qt',$_POST[''], SQLITE3_TEXT);
+// $sql = 'INSERT INTO Stock Quantity VALUES :Quantity, WHERE Item_Name = :ItemName';
 
+function InsertUsed() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+       'UPDATE Stock 
+        SET Quantity=:Quantity 
+        WHERE Item_Name=:"ItemName"';
+    
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':ItemName',  $_POST['DItem'], SQLITE3_TEXT);
+    $stmt->bindParam(':Quantity',  $_POST['QDI'], SQLITE3_TEXT);
+    $stmt->execute();
+
+    echo "insert stock";
+    echo $_POST['DItem'];
+    echo $_POST['QDI'];
+
+}
+
+if (isset($_POST['IUApply'])) {
+   
+    echo $_POST['DItem'];
+    echo $_POST['QDI'];
+    
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -88,7 +106,7 @@ if (isset($_POST['delete'])) {deleteSelected();}
         <!-- Apply Tab-->
         <div class="col-md-3">  
             <form method="post">
-                <input type="submit" value="APPLY" class="w1-tab-unselected" name="apply">
+                <input type="submit" value="APPLY" class="w1-tab-unselected" name="IUApply">
             </form>  
         </div>
        
@@ -115,15 +133,15 @@ if (isset($_POST['delete'])) {deleteSelected();}
                         <tbody>
                             <?php 
                             $stock = getCurrentDairyStock();
-                            for ($i=0; $i<count($stock); $i++):     
+                            for ($i=0; $i<count($stock); $i++):    
                             ?>
                             <tr> 
                                 <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
                                 <td style="padding-top:4px">
                                     <form method="post">
                                         <div class="form-group" ></div>
-                                            <input type="hidden" name="dairyInput" value = "<?php $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="quantityDairyInput" placeholder="Insert quantity used">
+                                            <input type="text" name="DItem" value="<?php echo $stock[$i]['Item_Name'] ?>">
+                                            <input type="text" name="QDI" placeholder="Insert quantity used">
                                         </div>
                                     </form>
                                 </td>                                
