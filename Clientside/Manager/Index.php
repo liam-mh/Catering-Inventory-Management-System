@@ -66,7 +66,7 @@ while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
 //update selected
 if (isset($_POST['edit'])) {updateSelected();}
 //delete selectd
-if (isset($_POST['delete'])){deleteSelected();}
+if (isset($_POST['delete'])) {deleteSelected();}
 
 ?>
 
