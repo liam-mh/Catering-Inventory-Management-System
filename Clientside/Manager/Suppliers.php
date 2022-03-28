@@ -51,8 +51,7 @@ if (isset($_POST['VUpdate'])) {updateSupplierVeg();}
 
                         <br><br>
 
-                        <h>RECENT ORDERS</h>
-                        <br>
+                        <p>RECENT ORDERS</p>
                         <table class="styled-table" style="display:block; height:100px; overflow:auto;">
                             <thead>
                                 <th>Date</th>
@@ -96,8 +95,7 @@ if (isset($_POST['VUpdate'])) {updateSupplierVeg();}
 
                         <br><br>
 
-                        <h>RECENT ORDERS</h>
-                        <br>
+                        <p>RECENT ORDERS</p>
                         <table class="styled-table" style="display:block; height:100px; overflow:auto;">
                             <thead>
                                 <th>Date</th>
@@ -141,8 +139,7 @@ if (isset($_POST['VUpdate'])) {updateSupplierVeg();}
 
                         <br><br>
 
-                        <h>RECENT ORDERS</h>
-                        <br>
+                        <p>RECENT ORDERS</p>
                         <table class="styled-table" style="display:block; height:100px; overflow:auto;">
                             <thead>
                                 <th>Date</th>
