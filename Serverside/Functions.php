@@ -29,6 +29,40 @@ function InsertUsed() {
 
 }
 
+function updateSelected() {
+
+    //Unit price calculation
+    $pounds = $_POST['UpdateUnitPounds'];
+    $pence = $_POST['UpdateUnitPence'];
+    $UpdateUnitPrice = ($pounds*100) + $pence;
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+       'UPDATE Stock 
+        SET Item_Name=:ItemName, Category=:Category, Unit_Price=:UnitPrice, Threshold=:Threshold, Quantity=:Quantity 
+        WHERE Item_Name=:Name';
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name',      $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
+    $stmt->bindParam(':ItemName',  $_POST['UpdateItemName'], SQLITE3_TEXT);
+    $stmt->bindParam(':Category',  $_POST['UpdateCategory'], SQLITE3_TEXT);
+    $stmt->bindParam(':UnitPrice', $UpdateUnitPrice, SQLITE3_INTEGER);
+    $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
+    $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
+    $stmt->execute();
+    header('Location:Index.php?updated=true"');
+}
+
+function deleteSelected() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'DELETE FROM Stock WHERE Item_Name=:Name';
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name', $selected, SQLITE3_TEXT);
+    $stmt->execute();
+    header("Location:Index.php?deleted=true");
+
+}
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
 
