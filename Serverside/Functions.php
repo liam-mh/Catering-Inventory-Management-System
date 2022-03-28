@@ -103,7 +103,7 @@ function getCurrentVegStock () {
 }
 
 //-------------------------------------------------------------------------------------------------------
-//----- GETTING FROM SUPLLIERS --------------------------------------------------------------------------
+//----- SUPLLIERS ---------------------------------------------------------------------------------------
 
 function getSupplier () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -112,6 +112,49 @@ function getSupplier () {
         $rows_array[]=$row;
     }
     return $rows_array;
+}
+
+function updateDS() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+       'UPDATE Supplier 
+        SET Name=:Name, Email=:Email
+        WHERE Category="Dairy"';
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name',  $_POST['DN'], SQLITE3_TEXT);
+    $stmt->bindParam(':Email', $_POST['DE'], SQLITE3_TEXT);
+    $stmt->execute();
+    header('Location:Suppliers.php?updatedDairy=true"');
+}
+function updateMS() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+       'UPDATE Supplier 
+        SET Name=:Name, Email=:Email
+        WHERE Category="Meat / Fish"';
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name',  $_POST['MN'], SQLITE3_TEXT);
+    $stmt->bindParam(':Email', $_POST['ME'], SQLITE3_TEXT);
+    $stmt->execute();
+    header('Location:Suppliers.php?updatedMeat=true"');
+}
+function updateFS() {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 
+       'UPDATE Supplier 
+        SET Name=:Name, Email=:Email
+        WHERE Category="Fruit / Veg"';
+
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Name',  $_POST['FN'], SQLITE3_TEXT);
+    $stmt->bindParam(':Email', $_POST['FE'], SQLITE3_TEXT);
+    $stmt->execute();
+    header('Location:Suppliers.php?updatedFruitVeg=true"');
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -128,6 +171,7 @@ function dairyIO () {
 
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING PDFS ------------------------------------------------------------------------------------
+
 function getDairyPDF () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM PDF WHERE Category = "Dairy"');

@@ -13,44 +13,10 @@ if (!isset($_SESSION['Username'])) {
 $Name = $_SESSION['Username'];
 
 
-if (isset($_POST['apply'])) {
-    $insert = InsertUsed();
-}
-
-//-------------------------------------------------------------------------------------------------------
-//----- ADD NEW TAB -------------------------------------------------------------------------------------
-
-//Add new tab being selected
-$AddNew = FALSE;
-if (isset($_POST['AddNew'])) $AddNew = TRUE;
-
-//Setting error variables
-$ItemNameError = $CategoryError = $UnitPoundsError = $UnitPenceError = $ThresholdError = ""; 
-
-//add new item 
-$allFields = "yes";
-if (isset($_POST['add'])) {
-
-    if ($_POST['ItemName']=="")   {$ItemNameError = "Please enter the item name"; $allFields = "no";}
-    if ($_POST['Category']=="")   {$CategoryError = "Please select a category";   $allFields = "no";}
-    if ($_POST['UnitPounds']=="") {$UnitPoundsError = "Please enter pounds";      $allFields = "no";}
-    if ($_POST['UnitPence']=="")  {$UnitPenceError = "Please enter pence";        $allFields = "no";}
-    if ($_POST['Threshold']=="")  {$ThresholdError = "Please enter a threshold";  $allFields = "no";}
-    if ($allFields == "yes") {
-        addNew();
-    }
-}
-
-//-------------------------------------------------------------------------------------------------------
-//----- CURRENT STOCK / EDIT & DELETE -------------------------------------------------------------------
-
-//Updating database with 'apply' button
-if (isset($_POST['edit'])) {
-    update();
-}
-
-//-------------------------------------------------------------------------------------------------------
-//----- GETTING FROM SUPLLIERS --------------------------------------------------------------------------
+//Updating suppliers
+if (isset($_POST['DApply'])) {updateDS();}
+if (isset($_POST['MApply'])) {updateMS();}
+if (isset($_POST['FApply'])) {updateFS();}
 
 $supplier = getSupplier();
 
@@ -71,19 +37,17 @@ $supplier = getSupplier();
                         <br><br><br>
                         <p><?php echo $supplier[0][1]?></p>
                         <div class="w1-box">
-                            <h>NAME</h>
-                            <br>
-                            <input type="text" name="dairyNameInput" value="<?php $supplier[0][1] ?>">
+                            <p>NAME</p>
+                            <input type="text" name="DN" value="<?php echo $supplier[0][1] ?>">
                         </div>
                         <br>
                         <div class="w1-box">
-                            <h>EMAIL</h>
-                            <br>
-                            <input type="text" name="dairyEmailInput" value="<?php $supplier[0][2] ?>">
+                            <p>EMAIL</p>
+                            <input type="text" name="DE" value="<?php echo $supplier[0][2] ?>">
                         </div>
                         <br>
                         <div class="form-group">
-                            <input class="btn btn-main" style="width:50%" type="submit" value="APPLY" name="dairyApply"></input> 
+                            <input class="btn btn-main" style="width:50%" type="submit" value="APPLY" name="DApply"></input> 
                         </div> 
                     </form> 
                     <br><br>
@@ -117,19 +81,17 @@ $supplier = getSupplier();
                         <br><br><br>
                         <p><?php echo $supplier[1][1]?></p>
                         <div class="w1-box">
-                            <h>NAME</h>
-                            <br>
-                            <input type="text" name="dairyNameInput" value="<?php $supplier[0][1] ?>">
+                            <p>NAME</p>
+                            <input type="text" name="MN" value="<?php echo $supplier[1][1] ?>">
                         </div>
                         <br>
                         <div class="w1-box">
-                            <h>EMAIL</h>
-                            <br>
-                            <input type="text" name="dairyEmailInput" value="<?php $supplier[0][2] ?>">
+                            <p>EMAIL</p>
+                            <input type="text" name="ME" value="<?php echo $supplier[1][2] ?>">
                         </div>
                         <br>
                         <div class="form-group">
-                            <input class="btn btn-main" style="width:50%" type="submit" value="APPLY" name="dairyApply"></input> 
+                            <input class="btn btn-main" style="width:50%" type="submit" value="APPLY" name="MApply"></input> 
                         </div> 
                     </form> 
                     <br><br>
@@ -163,19 +125,17 @@ $supplier = getSupplier();
                         <br><br><br>
                         <p><?php echo $supplier[2][1]?></p>
                         <div class="w1-box">
-                            <h>NAME</h>
-                            <br>
-                            <input type="text" name="dairyNameInput" value="<?php $supplier[0][1] ?>">
+                            <p>NAME</p>
+                            <input type="text" name="FN" value="<?php echo $supplier[2][1] ?>">
                         </div>
                         <br>
                         <div class="w1-box">
-                            <h>EMAIL</h>
-                            <br>
-                            <input type="text" name="dairyEmailInput" value="<?php $supplier[0][2] ?>">
+                            <p>EMAIL</p>
+                            <input type="text" name="FE" value="<?php echo $supplier[2][2] ?>">
                         </div>
                         <br>
                         <div class="form-group">
-                            <input class="btn btn-main" style="width:50%" type="submit" value="APPLY" name="dairyApply"></input> 
+                            <input class="btn btn-main" style="width:50%" type="submit" value="APPLY" name="FApply"></input> 
                         </div> 
                     </form> 
                     <br><br>
