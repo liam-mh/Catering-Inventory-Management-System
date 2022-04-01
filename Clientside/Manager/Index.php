@@ -30,10 +30,6 @@ function InsertUsed() {
     $stmt->bindParam(':Quantity',  $_POST['QDI'], SQLITE3_TEXT);
     $stmt->execute();
 
-    echo "insert stock";
-    echo $_POST['DItem'];
-    echo $_POST['QDI'];
-
 }
 
 if (isset($_POST['IUApply'])) {
@@ -133,19 +129,19 @@ if (isset($_POST['delete'])) {deleteSelected();}
                         <tbody>
                             <?php 
                             $stock = getCurrentDairyStock();
-                            for ($i=0; $i<count($stock); $i++):    
+                            for ($i=0; $i<count($stock); $i++):  
                             ?>
+                            <form method="post">
                             <tr> 
                                 <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
-                                <td style="padding-top:4px">
-                                    <form method="post">
-                                        <div class="form-group" ></div>
-                                            <input type="text" name="DItem" value="<?php echo $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="QDI" placeholder="Insert quantity used">
-                                        </div>
-                                    </form>
+                                <td style="padding-top:15px">                                    
+                                    <div class="form-group">
+                                        <input type="text" name="DItem" value="<?php echo $stock[$i]['Item_Name'] ?>">
+                                        <input type="text" name="QDI" placeholder="Insert quantity used">
+                                    </div>                                    
                                 </td>                                
                             </tr>
+                            </form>
                             <?php endfor; ?>
                         </tbody>
                     </table>                        
@@ -162,7 +158,7 @@ if (isset($_POST['delete'])) {deleteSelected();}
                                 <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
                                 <td style="padding-top:4px">
                                     <form method="post">
-                                        <div class="form-group" ></div>
+                                        <div class="form-group"></div>
                                             <input type="hidden" name="meatInput" value = "<?php $stock[$i]['Item_Name'] ?>">
                                             <input type="text" name="quantityMeatInput" placeholder="Insert quantity used">
                                         </div>
