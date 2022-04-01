@@ -13,46 +13,6 @@ if (!isset($_SESSION['Username'])) {
 $Name = $_SESSION['Username'];
 
 
-
-//-------------------------------------------------------------------------------------------------------
-//----- INSERT USED STOCK -------------------------------------------------------------------------------
-
-if (isset($_POST['apply'])) {
-    $insert = InsertUsed();
-}
-
-//-------------------------------------------------------------------------------------------------------
-//----- ADD NEW TAB -------------------------------------------------------------------------------------
-
-//Add new tab being selected
-$AddNew = FALSE;
-if (isset($_POST['AddNew'])) $AddNew = TRUE;
-
-//Setting error variables
-$ItemNameError = $CategoryError = $UnitPoundsError = $UnitPenceError = $ThresholdError = ""; 
-
-//add new item 
-$allFields = "yes";
-if (isset($_POST['add'])) {
-
-    if ($_POST['ItemName']=="")   {$ItemNameError = "Please enter the item name"; $allFields = "no";}
-    if ($_POST['Category']=="")   {$CategoryError = "Please select a category";   $allFields = "no";}
-    if ($_POST['UnitPounds']=="") {$UnitPoundsError = "Please enter pounds";      $allFields = "no";}
-    if ($_POST['UnitPence']=="")  {$UnitPenceError = "Please enter pence";        $allFields = "no";}
-    if ($_POST['Threshold']=="")  {$ThresholdError = "Please enter a threshold";  $allFields = "no";}
-    if ($allFields == "yes") {
-        addNew();
-    }
-}
-
-//-------------------------------------------------------------------------------------------------------
-//----- CURRENT STOCK / EDIT & DELETE -------------------------------------------------------------------
-
-//Updating database with 'apply' button
-if (isset($_POST['edit'])) {
-    update();
-}
-
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM SUPLLIERS --------------------------------------------------------------------------
 
