@@ -134,7 +134,7 @@ if (isset($_POST['delete'])) {deleteSelected();}
                             <form method="post">
                             <tr> 
                                 <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
-                                <td style="padding-top:15px">                                    
+                                <td style="padding-top:18px">                                    
                                     <div class="form-group">
                                         <input type="text" name="DItem" value="<?php echo $stock[$i]['Item_Name'] ?>">
                                         <input type="text" name="QDI" placeholder="Insert quantity used">
