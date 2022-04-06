@@ -56,10 +56,10 @@ while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
 if (isset($_POST['edit'])) {updateSelected();}
 //delete selected
 if (isset($_POST['delete'])) {deleteSelected();}
+
 //insert quantity into selected
-//if (isset($_POST['insert'])) {insertSelected();}
-
-
+$AlertQ = FALSE;
+$AlertT = FALSE;
 if (isset($_POST['insert'])) {
 
     //Subtracting insert quantity
@@ -67,27 +67,42 @@ if (isset($_POST['insert'])) {
     $InsertQ = $_POST['InsertQuantity'];
     $NewQ = $CurrentQ-$InsertQ;
 
-    if ($NewQ <= 0) {
-        echo "Insert used quantity larger than current stock level";
+    $N = $SelectedItem[0][0];
+    $Threshold = $SelectedItem[0][3];
+    $Cat = $SelectedItem[0][1];
+
+    if ($NewQ < 0) {
+
+        //insert number larger than current stock alert
+        $AlertQ = TRUE; 
+
     } else {
 
+        //Updating quantity
         $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-
         $sql = 'UPDATE Stock SET Quantity=:NewQ WHERE Item_Name=:Name';
-
         $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Name', $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
+        $stmt->bindParam(':Name', $N, SQLITE3_TEXT);
         $stmt->bindParam(':NewQ', $NewQ, SQLITE3_INTEGER);
         $stmt->execute();  
 
+        //Add item to Item_Order table if below threshold
+        if ($NewQ < $Threshold) {
+
+            $AlertT = TRUE;
+
+            $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+            $sql = 'INSERT INTO Item_Order (Item_Name, Category) 
+                    VALUES (:ItemName, :Category)';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
+            $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
+            $stmt->execute();  
+        }
+
         header("Refresh:0");
-
     }
-
 }
-
-
-
 
 ?>
 
@@ -107,7 +122,27 @@ if (isset($_POST['insert'])) {
             </div> 
         </div>
 
-        <div class="col-md-6"></div>
+        <!-- ALERTS -->
+        <div class="col-md-6">
+            <!-- ALERT: insert larger than quantity -->
+            <?php if ($AlertQ == TRUE): ?>
+                <div class="alert alert-danger alert-dismissible showcol-10" role="alert" style="font-weight: bold;">
+                    Insert used quantity larger than current stock level
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+            <!-- ALERT: Item below threshold -->
+            <?php if ($AlertT == TRUE): ?>
+                <div class="alert alert-danger alert-dismissible showcol-10" role="alert" style="font-weight: bold;">
+                    <?php echo $selected; ?> is below set threshold, and has been added to orders page.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
 
         <!-- Add New Item-->
         <div class="col-md-3">  
@@ -116,6 +151,7 @@ if (isset($_POST['insert'])) {
             </form>  
         </div>
     </div>  
+    
 
     <div style="text-align:center">  
         <div class="w1-box row">

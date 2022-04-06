@@ -8,7 +8,8 @@ function addNew() {
     $UnitPrice = ($pounds*100) + $pence;
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO Stock (Item_Name, Category, Unit_Price, Threshold) VALUES (:ItemName, :Category, :UnitPrice, :Threshold)';
+    $sql = 'INSERT INTO Stock (Item_Name, Category, Unit_Price, Threshold) 
+            VALUES (:ItemName, :Category, :UnitPrice, :Threshold)';
     $stmt = $db->prepare($sql); 
     $stmt->bindParam(':ItemName',  $_POST['ItemName'], SQLITE3_TEXT);
     $stmt->bindParam(':Category',  $_POST['Category'], SQLITE3_TEXT);
@@ -39,46 +40,8 @@ function updateSelected() {
     $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
     $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
     $stmt->execute();
-    header('Location:Index.php?updated=true"');
-}
 
-function insertSelected() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-
-    $sql = 'SELECT Quantity FROM Stock WHERE Item_Name=:Name';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name', $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
-    $firstNum = $stmt->execute();   
-
-
-    
-    $sql = 
-       'UPDATE Stock 
-        SET Quantity=:Quantity
-        WHERE Item_Name=:Name';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',      $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity',  $_POST['InsertQuantity'], SQLITE3_INTEGER);
-    $stmt->execute();
-    header('Location:Index.php?inserted=true"');
-}
-
-function insertSelectedBU() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 
-       'UPDATE Stock 
-        SET Quantity=:Quantity 
-        WHERE Item_Name=:Name';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',      $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity',  $_POST['InsertQuantity'], SQLITE3_INTEGER);
-    $stmt->execute();
-    header('Location:Index.php?inserted=true"');
+    header('Refresh:0');
 }
 
 function deleteSelected() {
@@ -104,34 +67,8 @@ function getCurrentStock () {
     return $rows_array;
 }
 
-//Item names for insert used stock
-function getCurrentDairyStock () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock WHERE Category = "Dairy"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getCurrentMeatStock () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock WHERE Category = "Meat / Fish"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getCurrentVegStock () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock WHERE Category = "Fruit / Veg"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-
 //-------------------------------------------------------------------------------------------------------
-//----- SUPLLIERS ---------------------------------------------------------------------------------------
+//----- SUPPLIERS ---------------------------------------------------------------------------------------
 
 function getSupplier () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
