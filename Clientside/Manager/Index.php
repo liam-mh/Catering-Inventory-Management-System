@@ -1,7 +1,5 @@
 <?php 
 
-error_reporting(1);
-
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
@@ -43,7 +41,7 @@ if (isset($_POST['add'])) {
 
 $selected = $_GET['Selected'];
 
-//$_GET for edit/delete
+//Getting selected stock items details
 $db = new SQLite3('/Applications/MAMP/db/IMS.db');
 $sql = "SELECT * FROM Stock WHERE Item_name = :Itemname";
 $stmt = $db->prepare($sql);

@@ -125,6 +125,20 @@ function updateFS() {
 //-------------------------------------------------------------------------------------------------------
 //----- ORDERS & ORDER ITEMS ----------------------------------------------------------------------------
 
+function dairyTP () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT Total FROM Item_Order');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    $a = $rows_array;
+
+    $sum = 0;
+    for ($i=0; $i<count($a); $i++) {
+        $sum = $sum + $a[$i][0];
+    }
+    return $sum;
+}
 function dairyIO () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy"');
