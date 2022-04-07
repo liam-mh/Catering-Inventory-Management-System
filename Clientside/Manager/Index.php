@@ -13,33 +13,6 @@ if (!isset($_SESSION['Username'])) {
 $Name = $_SESSION['Username'];
 
 //-------------------------------------------------------------------------------------------------------
-//----- INSERT USED STOCK -------------------------------------------------------------------------------
-
-// $sql = 'INSERT INTO Stock Quantity VALUES :Quantity, WHERE Item_Name = :ItemName';
-
-function InsertUsed() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 
-       'UPDATE Stock 
-        SET Quantity=:Quantity 
-        WHERE Item_Name=:"ItemName"';
-    
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName',  $_POST['DItem'], SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity',  $_POST['QDI'], SQLITE3_TEXT);
-    $stmt->execute();
-
-}
-
-if (isset($_POST['IUApply'])) {
-   
-    echo $_POST['DItem'];
-    echo $_POST['QDI'];
-    
-}
-
-//-------------------------------------------------------------------------------------------------------
 //----- ADD NEW TAB -------------------------------------------------------------------------------------
 
 //Add new tab being selected
@@ -68,7 +41,7 @@ if (isset($_POST['add'])) {
 
 $selected = $_GET['Selected'];
 
-//$_GET for edit/delete
+//Getting selected stock items details
 $db = new SQLite3('/Applications/MAMP/db/IMS.db');
 $sql = "SELECT * FROM Stock WHERE Item_name = :Itemname";
 $stmt = $db->prepare($sql);
@@ -79,124 +52,61 @@ while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
 
 //update selected
 if (isset($_POST['edit'])) {updateSelected();}
-//delete selectd
+//delete selected
 if (isset($_POST['delete'])) {deleteSelected();}
+
+//insert quantity into selected
+$AlertQ = FALSE;
+$AlertT = FALSE;
+if (isset($_POST['insert'])) {
+
+    //Subtracting insert quantity
+    $CurrentQ = $SelectedItem[0][4];
+    $InsertQ = $_POST['InsertQuantity'];
+    $NewQ = $CurrentQ-$InsertQ;
+
+    $N = $SelectedItem[0][0];
+    $Threshold = $SelectedItem[0][3];
+    $Cat = $SelectedItem[0][1];
+
+    if ($NewQ < 0) {
+
+        //insert number larger than current stock alert
+        $AlertQ = TRUE; 
+
+    } else {
+
+        //Updating quantity
+        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+        $sql = 'UPDATE Stock SET Quantity=:NewQ WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name', $N, SQLITE3_TEXT);
+        $stmt->bindParam(':NewQ', $NewQ, SQLITE3_INTEGER);
+        $stmt->execute();  
+
+        //Add item to Item_Order table if below threshold
+        if ($NewQ < $Threshold) {
+
+            $AlertT = TRUE;
+
+            $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+            $sql = 'INSERT INTO Item_Order (Item_Name, Category) 
+                    VALUES (:ItemName, :Category)';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
+            $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
+            $stmt->execute();  
+        }
+
+        header("Refresh:0");
+    }
+}
 
 ?>
 
 <body>
     <?php require("ManagerNavbar.php");?>
     <div class="container">
-
-    <div class="row">
-
-        <!-- Insert Used Stock Tab -->
-        <div class="col-md-3" style="text-align:center">  
-            <div class="w1-tab">
-                <h>INSERT USED STOCK</h>
-            </div> 
-        </div>
-
-        <div class="col-md-6"></div>
-
-        <!-- Apply Tab-->
-        <div class="col-md-3">  
-            <form method="post">
-                <input type="submit" value="APPLY" class="w1-tab-unselected" name="IUApply">
-            </form>  
-        </div>
-       
-
-    </div>  
-
-    <div style="text-align:center">  
-        <div class="w1-box">
-
-            <!-- Column Titles -->
-            <div class="row">
-                <div class="col"><h>DAIRY</h></div>
-                <div class="col"><h>MEAT / FISH</h></div>
-                <div class="col"><h>FRUIT / VEG</h></div>
-            </div>   
-            <br> 
-
-            <!-- Insert Used stock -->
-            <div class="row">
-
-                <!-- Dairy -->
-                <div class="col-md-4">                      
-                    <table class="styled-table" style="display:block; height:140px; overflow:auto;">
-                        <tbody>
-                            <?php 
-                            $stock = getCurrentDairyStock();
-                            for ($i=0; $i<count($stock); $i++):  
-                            ?>
-                            <form method="post">
-                            <tr> 
-                                <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
-                                <td style="padding-top:15px">                                    
-                                    <div class="form-group">
-                                        <input type="text" name="DItem" value="<?php echo $stock[$i]['Item_Name'] ?>">
-                                        <input type="text" name="QDI" placeholder="Insert quantity used">
-                                    </div>                                    
-                                </td>                                
-                            </tr>
-                            </form>
-                            <?php endfor; ?>
-                        </tbody>
-                    </table>                        
-                </div>
-                <!-- Meat/Fish -->
-                <div class="col-md-4">                      
-                    <table class="styled-table" style="display:block; height:140px; overflow:auto;">
-                        <tbody>
-                            <?php 
-                            $stock = getCurrentMeatStock();
-                            for ($i=0; $i<count($stock); $i++):     
-                            ?>
-                            <tr> 
-                                <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
-                                <td style="padding-top:4px">
-                                    <form method="post">
-                                        <div class="form-group"></div>
-                                            <input type="hidden" name="meatInput" value = "<?php $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="quantityMeatInput" placeholder="Insert quantity used">
-                                        </div>
-                                    </form>
-                                </td>                                
-                            </tr>
-                            <?php endfor; ?>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- Fruit/Veg -->
-                <div class="col-md-4">                      
-                    <table class="styled-table" style="display:block; height:140px; overflow:auto;">
-                        <tbody>
-                            <?php 
-                            $stock = getCurrentVegStock();
-                            for ($i=0; $i<count($stock); $i++):     
-                            ?>
-                            <tr> 
-                                <td style="width:100px"><?php echo $stock[$i]['Item_Name']?></td>
-                                <td style="padding-top:4px">
-                                    <form method="post">
-                                        <div class="form-group" ></div>
-                                            <input type="hidden" name="vegInput" value = "<?php $stock[$i]['Item_Name'] ?>">
-                                            <input type="text" name="quantityVegInput" placeholder="Insert quantity used">
-                                        </div>
-                                    </form>
-                                </td>                                
-                            </tr>
-                            <?php endfor; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>  
-        </div> 
-    </div>
-
-    <br><br>
 
     <!-- Current Stock and Table ------------------------------------------------------------------------------------>
     
@@ -210,7 +120,27 @@ if (isset($_POST['delete'])) {deleteSelected();}
             </div> 
         </div>
 
-        <div class="col-md-6"></div>
+        <!-- ALERTS -->
+        <div class="col-md-6">
+            <!-- ALERT: insert larger than quantity -->
+            <?php if ($AlertQ == TRUE): ?>
+                <div class="alert alert-danger alert-dismissible showcol-10" role="alert" style="font-weight: bold;">
+                    Insert used quantity larger than current stock level
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+            <!-- ALERT: Item below threshold -->
+            <?php if ($AlertT == TRUE): ?>
+                <div class="alert alert-danger alert-dismissible showcol-10" role="alert" style="font-weight: bold;">
+                    <?php echo $selected; ?> is below set threshold, and has been added to orders page.
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            <?php endif; ?>
+        </div>
 
         <!-- Add New Item-->
         <div class="col-md-3">  
@@ -219,13 +149,14 @@ if (isset($_POST['delete'])) {deleteSelected();}
             </form>  
         </div>
     </div>  
+    
 
     <div style="text-align:center">  
         <div class="w1-box row">
 
             <div class="col-md-8">
                 <!-- CURRENT STOCK  -->
-                <table class="styled-table" style="display:block; height:335px; overflow:auto;">
+                <table class="styled-table" style="display:block; height:570px; overflow:auto;">
                     <thead>
                         <th>Item Name</th>
                         <th>In Stock</th>
@@ -252,70 +183,103 @@ if (isset($_POST['delete'])) {deleteSelected();}
                 </table>
             </div>
 
-            <!-- UPDATE SELECTED STOCK -->
+            <!-- SELECTED STOCK -->
 
             <?php if($_GET['Selected']!=""): ?>
 
-            <div class="col-md-4 black-box">
-                
-                <form method="post">
+            <div class="col-md-4">
 
-                    <div class="form-group row">
-                        <label class="control-label labelFont col">NAME</label>
-                        <input class="col" type="text" name="UpdateItemName" value="<?php echo $SelectedItem[0][0]; ?>">
-                    </div>
+                <div style="text-align:center">
+                    <h style="color: #E8175D">STOCK ITEM SELECTED: <?php echo $_GET['Selected']?></h>
+                </div>
 
-                    <div class="form-group row">
-                        <label class="control-label labelFont col">IN STOCK</label>
-                        <input class="col" type="text" name="UpdateQuantity" value="<?php echo $SelectedItem[0][4]; ?>">
-                    </div>
-                    <div class="form-group row">
-                        <label class="control-label labelFont col">CATEGORY</label>
-                        <select class="col" name="UpdateCategory"> 
-                            <option value="Meat / Fish" <?php echo($SelectedItem[0][1]=="Meat / Fish") ? "selected" : ""; ?> >Meat / Fish</option> 
-                            <option value="Dairy"       <?php echo($SelectedItem[0][1]=="Dairy")       ? "selected" : ""; ?> >Dairy</option> 
-                            <option value="Fruit / Veg" <?php echo($SelectedItem[0][1]=="Fruit / Veg") ? "selected" : ""; ?> >Fruit / Veg</option> 
-                        </select>    
-                    </div>
-                    <div class="form-group row">
-                        <label class="control-label labelFont col">THRESHOLD</label>
-                        <input class="col" type="text" name="UpdateThreshold" value="<?php echo $SelectedItem[0][3]; ?>">
-                    </div>
-                    <div class="form-group row">
-                        <label class="control-label labelFont col-md-6">PRICE £</label>
-                        <?php //variables for price display
-                            $selectedPrice = $SelectedItem[0][2];
-                            $selectedPence = substr($selectedPrice, -2);
-                            $selectedPound = substr($selectedPrice, 0, -2);
-                        ?>
-                        <input class="col" type="text" name="UpdateUnitPounds" value="<?php echo $selectedPound; ?>">
-                        <div class="col-md-1">.</div>
-                        <input class="col" type="text" name="UpdateUnitPence" value="<?php echo $selectedPence; ?>">
-                    </div>
-        
-                    <!-- apply and delete button -->
-                    <br>
-                    <div class="row">
-                        <div class="col" style="text-align:center"> 
-                            <form method="post">
+                <br>
+
+                <div class="black-box">
+
+                    <p>INSERT USED STOCK</p>
+
+                    <form method="post">
+
+                        <div class="form-group row">
+                            <input class="col" type="text" name="InsertQuantity" placeholder="Quantity">
+                            <div class="col" style="text-align:center">                             
                                 <input type="hidden" name="SelectedUpdateItemName" value="<?php echo $_GET['Selected'] ?>">   
-                                <input type="submit" value="APPLY" class="btn btn-main" name="edit">
-                            </form>
+                                <input type="submit" value="INSERT" class="btn btn-main" name="insert">
+                            </div>
                         </div>
-                        
-                        <div class="col" style="text-align:center"> 
-                            <form method="post">    
-                                <input type="hidden" name="selected" value ="<?php echo $_GET['Selected'] ?>">                       
-                                <input type="submit" value="DELETE" class="btn btn-danger" name="delete">
-                            </form>
+    
+                    </form>
+                </div>   
+
+                <br>
+
+                <!-- UPDATE SELECTED STOCK -->
+                <div class="black-box">
+
+                    <p>UPDATE / DELETE</p>
+
+                    <form method="post">
+
+                        <div class="form-group row">
+                            <label class="control-label labelFont col">NAME</label>
+                            <input class="col" type="text" name="UpdateItemName" value="<?php echo $SelectedItem[0][0]; ?>">
                         </div>
-                    </div> 
 
-                </form>
+                        <div class="form-group row">
+                            <label class="control-label labelFont col">IN STOCK</label>
+                            <input class="col" type="text" name="UpdateQuantity" value="<?php echo $SelectedItem[0][4]; ?>">
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label labelFont col">CATEGORY</label>
+                            <select class="col" name="UpdateCategory"> 
+                                <option value="Meat / Fish" <?php echo($SelectedItem[0][1]=="Meat / Fish") ? "selected" : ""; ?> >Meat / Fish</option> 
+                                <option value="Dairy"       <?php echo($SelectedItem[0][1]=="Dairy")       ? "selected" : ""; ?> >Dairy</option> 
+                                <option value="Fruit / Veg" <?php echo($SelectedItem[0][1]=="Fruit / Veg") ? "selected" : ""; ?> >Fruit / Veg</option> 
+                            </select>    
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label labelFont col">THRESHOLD</label>
+                            <input class="col" type="text" name="UpdateThreshold" value="<?php echo $SelectedItem[0][3]; ?>">
+                        </div>
+                        <div class="form-group row">
+                            <label class="control-label labelFont col-md-6">PRICE £</label>
+                            <?php //variables for price display
+                                $selectedPrice = $SelectedItem[0][2];
+                                $selectedPence = substr($selectedPrice, -2);
+                                $selectedPound = substr($selectedPrice, 0, -2);
+                            ?>
+                            <input class="col" type="text" name="UpdateUnitPounds" value="<?php echo $selectedPound; ?>">
+                            <div class="col-md-1">.</div>
+                            <input class="col" type="text" name="UpdateUnitPence" value="<?php echo $selectedPence; ?>">
+                        </div>
 
-            </div>
+                        <!-- apply and delete button -->
+                        <br>
+                        <div class="row">
+                            <div class="col" style="text-align:center"> 
+                                <form method="post">
+                                    <input type="hidden" name="SelectedUpdateItemName" value="<?php echo $_GET['Selected'] ?>">   
+                                    <input type="submit" value="APPLY" class="btn btn-main" name="edit">
+                                </form>
+                            </div>
+                            
+                            <div class="col" style="text-align:center"> 
+                                <form method="post">    
+                                    <input type="hidden" name="selected" value ="<?php echo $_GET['Selected'] ?>">                       
+                                    <input type="submit" value="DELETE" class="btn btn-danger" name="delete">
+                                </form>
+                            </div>
+                        </div> 
+
+                    </form>
+
+                </div>
+
+            </div>    
             
             <?php endif ?> 
+
         </div>            
     </div>        
 

@@ -8,7 +8,8 @@ function addNew() {
     $UnitPrice = ($pounds*100) + $pence;
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO Stock (Item_Name, Category, Unit_Price, Threshold) VALUES (:ItemName, :Category, :UnitPrice, :Threshold)';
+    $sql = 'INSERT INTO Stock (Item_Name, Category, Unit_Price, Threshold) 
+            VALUES (:ItemName, :Category, :UnitPrice, :Threshold)';
     $stmt = $db->prepare($sql); 
     $stmt->bindParam(':ItemName',  $_POST['ItemName'], SQLITE3_TEXT);
     $stmt->bindParam(':Category',  $_POST['Category'], SQLITE3_TEXT);
@@ -17,7 +18,6 @@ function addNew() {
     $stmt->execute();
 
 }
-
 
 function updateSelected() {
 
@@ -40,7 +40,8 @@ function updateSelected() {
     $stmt->bindParam(':Threshold', $_POST['UpdateThreshold'], SQLITE3_INTEGER);
     $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
     $stmt->execute();
-    header('Location:Index.php?updated=true"');
+
+    header('Refresh:0');
 }
 
 function deleteSelected() {
@@ -66,34 +67,8 @@ function getCurrentStock () {
     return $rows_array;
 }
 
-//Item names for insert used stock
-function getCurrentDairyStock () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock WHERE Category = "Dairy"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getCurrentMeatStock () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock WHERE Category = "Meat / Fish"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getCurrentVegStock () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock WHERE Category = "Fruit / Veg"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-
 //-------------------------------------------------------------------------------------------------------
-//----- SUPLLIERS ---------------------------------------------------------------------------------------
+//----- SUPPLIERS ---------------------------------------------------------------------------------------
 
 function getSupplier () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -150,6 +125,20 @@ function updateFS() {
 //-------------------------------------------------------------------------------------------------------
 //----- ORDERS & ORDER ITEMS ----------------------------------------------------------------------------
 
+function dairyTP () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT Total FROM Item_Order');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    $a = $rows_array;
+
+    $sum = 0;
+    for ($i=0; $i<count($a); $i++) {
+        $sum = $sum + $a[$i][0];
+    }
+    return $sum;
+}
 function dairyIO () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy"');
