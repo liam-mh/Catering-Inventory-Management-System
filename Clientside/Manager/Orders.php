@@ -1,5 +1,7 @@
 <?php 
 
+//error_reporting(0);
+
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
@@ -45,19 +47,37 @@ if (isset($_POST['AddDO'])) {
     $stmt->execute();
 }
 
-
+//Placing dairy order
+$Dsum=dairyTP();
 if (isset($_POST['PlaceDO'])) {
 
+    /*
+    //updating Order_Item table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Item_Order 
-            SET Order_Quantity=:Quantity, Total=:Total 
-            WHERE Item_Name=:ItemName';
+            SET Order_Placed = 1  
+            WHERE Category = "Dairy"';
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity', $_POST['OrderQuantity'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Total',    $total, SQLITE3_INTEGER);
+    $stmt->execute();
+    */
+
+    //Adding details to Order table
+
+    //current date 
+    $date  = new DateTime(); 
+    $formatDate = $date->format('d/m/y');
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'UPDATE Order 
+            SET Date = "test"  
+            WHERE Category = "Dairy"'; 
+           
+    $stmt = $db->prepare($sql); 
+    //$stmt->bindParam(':Date', $formatDate, SQLITE3_TEXT);
     $stmt->execute();
 
+    echo $formatDate;
+    echo $Dsum;
 }
 
 ?>
@@ -126,8 +146,8 @@ if (isset($_POST['PlaceDO'])) {
                         <p><?php echo $DIO[$i][1], " x ",$DIO[$i][0], " = £", number_format((($DIO[$i][3])/100),2);?></p>
                         <?php endfor; ?>
                         <br>
-                        <p>TOTAL PRICE: £<?php $Dsum=dairyTP(); echo $Dsum; ?></p>
-                        <form>
+                        <p>TOTAL PRICE: £<?php echo number_format((($Dsum)/100),2); ?></p>
+                        <form method="post">
                             <div class="form-group">        
                                 <input class="btn btn-main" style="width:50%" type="submit" value="PLACE ORDER" name="PlaceDO"></input> 
                             </div> 

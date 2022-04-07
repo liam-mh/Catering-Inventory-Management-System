@@ -125,9 +125,18 @@ function updateFS() {
 //-------------------------------------------------------------------------------------------------------
 //----- ORDERS & ORDER ITEMS ----------------------------------------------------------------------------
 
+//Low quantity items
+function dairyIO () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy" AND Order_Placed = ""');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
 function dairyTP () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT Total FROM Item_Order');
+    $rows = $db->query('SELECT Total FROM Item_Order WHERE Order_Placed = ""');
     while ($row=$rows->fetchArray()) {
         $rows_array[]=$row;
     }
@@ -139,13 +148,29 @@ function dairyTP () {
     }
     return $sum;
 }
-function dairyIO () {
+
+//Placed order items
+function PlacedDairyIO () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy"');
+    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy" AND Order_Placed = 1');
     while ($row=$rows->fetchArray()) {
         $rows_array[]=$row;
     }
     return $rows_array;
+}
+function PlacedDairyTP () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT Total FROM Item_Order WHERE Order_Placed = 1');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    $a = $rows_array;
+
+    $sum = 0;
+    for ($i=0; $i<count($a); $i++) {
+        $sum = $sum + $a[$i][0];
+    }
+    return $sum;
 }
 
 //-------------------------------------------------------------------------------------------------------
