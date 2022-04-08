@@ -14,6 +14,9 @@ if (!isset($_SESSION['Username'])) {
 }
 $SupplierName = $_SESSION['Username'];
 
+//-------------------------------------------------------------------------------------------------------
+//----- Getting values from db --------------------------------------------------------------------------
+
 //Getting logged in supplier category
 $db = new SQLite3('/Applications/MAMP/db/IMS.db');
 $sql = "SELECT * FROM Supplier WHERE Name = :Name";
@@ -34,7 +37,27 @@ $OD = [];
 while($row=$result->fetchArray(SQLITE3_NUM)){$OD [] = $row;}
 $orderDate = $OD[0][0];
 
+//order total
+$Dsum=PlacedDairyTP();
 
+//-------------------------------------------------------------------------------------------------------
+//----- ACCEPT / DECLINE ORDERS -------------------------------------------------------------------------
+
+//accept
+if (isset($_POST['accept'])) {
+
+    //current date 
+    $date  = new DateTime(); 
+    $formatDate = $date->format('d/m/y');
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'INSERT INTO PDF (Date, PDF_Link, Order_Total, Accept_Decline) 
+            VALUES (:Date, :Total, "Accepted")';
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':Date',  $formatDate, SQLITE3_TEXT);
+    $stmt->bindParam(':Total', $Dsum, SQLITE3_INTEGER);
+    $stmt->execute();
+}
 
 ?>
 
@@ -71,7 +94,7 @@ $orderDate = $OD[0][0];
                         </tbody>
                     </table>
                     <br>
-                    <p>ORDER TOTAL: £<?php $Dsum=PlacedDairyTP(); echo number_format((($Dsum)/100),2); ?></p>
+                    <p>ORDER TOTAL: £<?php echo number_format((($Dsum)/100),2); ?></p>
 
                     <!-- Accept and Decline buttons -->
                     <form method="post">
@@ -89,6 +112,7 @@ $orderDate = $OD[0][0];
                             </div>
                         </div> 
                     </form>
+                    <a class="nav-link" href="../../Serverside/OrderPDF.php?Category=<?php echo $category ?>" target="_blank">(PDF)</a>
                 </div>
             </div> 
             

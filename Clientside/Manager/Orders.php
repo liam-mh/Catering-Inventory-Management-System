@@ -51,7 +51,6 @@ if (isset($_POST['AddDO'])) {
 $Dsum=dairyTP();
 if (isset($_POST['PlaceDO'])) {
 
-    
     //updating Order_Item table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Item_Order 
