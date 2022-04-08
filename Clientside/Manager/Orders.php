@@ -51,7 +51,7 @@ if (isset($_POST['AddDO'])) {
 $Dsum=dairyTP();
 if (isset($_POST['PlaceDO'])) {
 
-    /*
+    
     //updating Order_Item table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Item_Order 
@@ -59,25 +59,20 @@ if (isset($_POST['PlaceDO'])) {
             WHERE Category = "Dairy"';
     $stmt = $db->prepare($sql); 
     $stmt->execute();
-    */
 
     //Adding details to Order table
-
     //current date 
     $date  = new DateTime(); 
     $formatDate = $date->format('d/m/y');
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Order 
-            SET Date = "test"  
-            WHERE Category = "Dairy"'; 
-           
+    $sql = 'UPDATE Whole_Order 
+            SET Order_Date=:Date, Order_Total=:Total  
+            WHERE Category = "Dairy"';    
     $stmt = $db->prepare($sql); 
-    //$stmt->bindParam(':Date', $formatDate, SQLITE3_TEXT);
+    $stmt->bindParam(':Date',  $formatDate, SQLITE3_TEXT);
+    $stmt->bindParam(':Total', $Dsum, SQLITE3_INTEGER);
     $stmt->execute();
-
-    echo $formatDate;
-    echo $Dsum;
 }
 
 ?>

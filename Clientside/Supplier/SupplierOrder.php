@@ -12,36 +12,29 @@ if (!isset($_SESSION['Username'])) {
     session_destroy();
     header("Location:".$path);
 }
-$Name = $_SESSION['Username'];
+$SupplierName = $_SESSION['Username'];
 
-$supplier = getSupplier();
+//Getting logged in supplier category
+$db = new SQLite3('/Applications/MAMP/db/IMS.db');
+$sql = "SELECT * FROM Supplier WHERE Name = :Name";
+$stmt = $db->prepare($sql);
+$stmt->bindParam(':Name', $SupplierName, SQLITE3_TEXT); 
+$result = $stmt->execute();
+$supplier = [];
+while($row=$result->fetchArray(SQLITE3_NUM)){$supplier [] = $row;}
+$category = $supplier[0][0];
 
-if (isset($_POST['AddDO'])) {
-
-    //Calculating total price of order
-    $total = $UnitPrice * $_POST['OrderQuantity'];
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Item_Order 
-            SET Order_Quantity=:Quantity, Total=:Total 
-            WHERE Item_Name=:ItemName';
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity', $_POST['OrderQuantity'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Total',    $total, SQLITE3_INTEGER);
-    $stmt->execute();
-}
+//Getting Order date from Whole_Order for logged in supplier
+$db = new SQLite3('/Applications/MAMP/db/IMS.db');
+$sql = "SELECT * FROM Whole_Order WHERE Category = :Cat";
+$stmt = $db->prepare($sql);
+$stmt->bindParam(':Cat', $category, SQLITE3_TEXT); 
+$result = $stmt->execute();
+$OD = [];
+while($row=$result->fetchArray(SQLITE3_NUM)){$OD [] = $row;}
+$orderDate = $OD[0][0];
 
 
-if (isset($_POST['PlaceDO'])) {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Item_Order 
-            SET Order_Placed = 1  
-            WHERE Category = "Dairy"';
-    $stmt = $db->prepare($sql); 
-    $stmt->execute();
-}
 
 ?>
 
@@ -55,8 +48,9 @@ if (isset($_POST['PlaceDO'])) {
 
             <div class="col-md-5">
                 <div class="w1-box">
-                                
-                    <p>ORDER DATE: </p>
+                    <p style="text-align:center"><?php echo $SupplierName ?> Current Order</p>
+                    <br>           
+                    <p>ORDER DATE: <?php echo $orderDate ?></p>
                     <table class="styled-table" style="display:block; height:200px; overflow:auto;">
                         <thead>
                             <th>Item</th> 
