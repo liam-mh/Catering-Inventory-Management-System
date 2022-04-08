@@ -17,7 +17,7 @@ if (isset($_POST['submit'])) {
             session_start();
             $_SESSION['Username'] = $Supplier[0]['Username'];
             $_SESSION['Password'] = $Supplier[0]['Password'];
-            header("Location: Index.php");
+            header("Location: SupplierOrder.php");
             exit(); 
         } else {
             $invalid = "Invalid login details";
