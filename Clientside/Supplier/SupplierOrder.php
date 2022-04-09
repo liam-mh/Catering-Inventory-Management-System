@@ -38,10 +38,9 @@ while($row=$result->fetchArray(SQLITE3_NUM)){$OD [] = $row;}
 $orderDate = $OD[0][0];
 
 //order total
-$Dsum=PlacedDairyTP();
-
+$Dsum=TotalPIO($category);
 //placed order dairy items
-$DIO = PlacedDairyIO();
+$DIO = getPlacedItemOrder($category);
 
 //-------------------------------------------------------------------------------------------------------
 //----- ACCEPT / DECLINE ORDERS -------------------------------------------------------------------------
@@ -53,7 +52,7 @@ if (isset($_POST['accept'])) {
     //current date 
     $date  = new DateTime(); 
     $formatDate = $date->format('d/m/y');
-    /*
+    
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'INSERT INTO PDF (Date, Category, Order_Total, Accept_Decline) 
             VALUES (:Date, :Cat, :Total, "Accepted")';
@@ -62,7 +61,6 @@ if (isset($_POST['accept'])) {
     $stmt->bindParam(':Cat',   $category, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $Dsum, SQLITE3_INTEGER);
     $stmt->execute();
-    */
 
     //Adding stock to Stock table
     for ($i=0; $i<count($DIO); $i++) {
@@ -99,7 +97,16 @@ if (isset($_POST['accept'])) {
         $stmt = $db->prepare($sql); 
         $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
         $stmt->execute();
+
+        //Removing date from Whole_Order
+        $sql = 'UPDATE Whole_Order 
+                SET Order_Date="NO CURRENT ORDERS" 
+                WHERE Category=:Cat';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Cat', $category, SQLITE3_TEXT);
+        $stmt->execute();
         
+        header('Refresh:0');
     }
 
 }
@@ -130,9 +137,9 @@ if (isset($_POST['accept'])) {
                             for ($i=0; $i<count($DIO); $i++):     
                             ?>
                             <tr> 
-                                <td><?php echo $DIO[$i]['Item_Name']?></td>                                                           
-                                <td><?php echo $DIO[$i]['Order_Quantity']?></td> 
-                                <td>£<?php echo number_format((($DIO[$i]['Total'])/100),2)?></td> 
+                                <td><?php echo $DIO[$i][0]?></td>                                                           
+                                <td><?php echo $DIO[$i][1]?></td> 
+                                <td>£<?php echo number_format((($DIO[$i][3])/100),2)?></td> 
                             </tr>
                             <?php endfor; ?>
                         </tbody>

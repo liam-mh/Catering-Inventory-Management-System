@@ -21,7 +21,7 @@ while($row=$result->fetchArray(SQLITE3_NUM)) {
 
 //Getting data from Item_Order table for logged in supplier
 $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-$sql = 'SELECT Item_Name, Order_Quantity, Total FROM Item_Order WHERE Category = :Cat AND Order_Placed = 1';
+$sql = 'SELECT Item_Name, Order_Quantity, Total FROM Item_Order WHERE Category = :Cat AND Placed = 1';
 $stmt = $db->prepare($sql);
 $stmt->bindParam(':Cat', $category, SQLITE3_TEXT); 
 $result = $stmt->execute();

@@ -57,7 +57,7 @@ $supplier = getSupplier();
                         <thead>
                             <th>Date</th>
                             <th>Accept/Decline</th>
-                            <th>Link</th>    
+                            <th>Total</th>    
                         </thead>
                         <tbody>
                             <?php 
@@ -67,7 +67,8 @@ $supplier = getSupplier();
                             <tr> 
                                 <td><?php echo $PDF[$i]['Date']?></td>                                                           
                                 <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td><a href="<?php echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td>                                                             
+                                <td>£<?php echo number_format((($PDF[$i]['Order_Total'])/100),2)?></td>
+                                <!-- <td><a href="<?php //echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td> -->                                                            
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -101,7 +102,7 @@ $supplier = getSupplier();
                         <thead>
                             <th>Date</th>
                             <th>Accept/Decline</th>
-                            <th>Link</th>    
+                            <th>Total</th>    
                         </thead>
                         <tbody>
                             <?php 
@@ -111,7 +112,7 @@ $supplier = getSupplier();
                             <tr> 
                                 <td><?php echo $PDF[$i]['Date']?></td>                                                           
                                 <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td><a href="<?php echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td>                                                             
+                                <td>£<?php echo number_format((($PDF[$i]['Order_Total'])/100),2)?></td>
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -145,7 +146,7 @@ $supplier = getSupplier();
                         <thead>
                             <th>Date</th>
                             <th>Accept/Decline</th>
-                            <th>Link</th>    
+                            <th>Total</th>    
                         </thead>
                         <tbody>
                             <?php 
@@ -155,7 +156,7 @@ $supplier = getSupplier();
                             <tr> 
                                 <td><?php echo $PDF[$i]['Date']?></td>                                                           
                                 <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td><a href="<?php echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td>                                                                                                                          
+                                <td>£<?php echo number_format((($PDF[$i]['Order_Total'])/100),2)?></td>
                             </tr>
                             <?php endfor; ?>
                         </tbody>
