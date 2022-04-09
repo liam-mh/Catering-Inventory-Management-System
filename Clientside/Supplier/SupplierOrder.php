@@ -40,23 +40,68 @@ $orderDate = $OD[0][0];
 //order total
 $Dsum=PlacedDairyTP();
 
+//placed order dairy items
+$DIO = PlacedDairyIO();
+
 //-------------------------------------------------------------------------------------------------------
 //----- ACCEPT / DECLINE ORDERS -------------------------------------------------------------------------
 
 //accept
 if (isset($_POST['accept'])) {
 
+    //Inseting into PDF table
     //current date 
     $date  = new DateTime(); 
     $formatDate = $date->format('d/m/y');
-
+    /*
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO PDF (Date, PDF_Link, Order_Total, Accept_Decline) 
-            VALUES (:Date, :Total, "Accepted")';
+    $sql = 'INSERT INTO PDF (Date, Category, Order_Total, Accept_Decline) 
+            VALUES (:Date, :Cat, :Total, "Accepted")';
     $stmt = $db->prepare($sql); 
     $stmt->bindParam(':Date',  $formatDate, SQLITE3_TEXT);
+    $stmt->bindParam(':Cat',   $category, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $Dsum, SQLITE3_INTEGER);
     $stmt->execute();
+    */
+
+    //Adding stock to Stock table
+    for ($i=0; $i<count($DIO); $i++) {
+
+        //variables for name and quantity of placed order
+        $Name = $DIO[$i][0];
+        $AcceptQuantity = $DIO[$i][1];
+
+        //Getting remaining stock from stock table
+        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+        $sql = 'SELECT Quantity FROM Stock WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name',     $Name, SQLITE3_TEXT);
+        $stmt->bindParam(':Quantity', $_POST['UpdateQuantity'], SQLITE3_INTEGER);
+        $result = $stmt->execute();
+        $oldQ = [];
+        while($row=$result->fetchArray(SQLITE3_NUM)){$oldQ [] = $row;}
+        $OQ = $oldQ[0][0];
+
+        //Adding new quantity onto remaining stock
+        $NewTotal = $OQ + $AcceptQuantity;
+
+        //Inserting new qauntity into Stock table
+        $sql = 'UPDATE Stock 
+                SET Quantity=:Quantity 
+                WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name',     $Name, SQLITE3_TEXT);
+        $stmt->bindParam(':Quantity', $NewTotal, SQLITE3_INTEGER);
+        $stmt->execute();
+
+        //Removing items from Item_Order table as back above threshold
+        $sql = 'DELETE FROM Item_Order WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
+        $stmt->execute();
+        
+    }
+
 }
 
 ?>
@@ -82,7 +127,6 @@ if (isset($_POST['accept'])) {
                         </thead>
                         <tbody>
                             <?php 
-                            $DIO = PlacedDairyIO();
                             for ($i=0; $i<count($DIO); $i++):     
                             ?>
                             <tr> 
