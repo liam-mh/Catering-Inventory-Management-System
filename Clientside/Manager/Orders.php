@@ -5,6 +5,7 @@
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
+//session
 $path = "ManagerLogin.php";
 session_start(); 
 if (!isset($_SESSION['Username'])) {
@@ -12,23 +13,19 @@ if (!isset($_SESSION['Username'])) {
     session_destroy();
     header("Location:".$path);
 }
-$Name = $_SESSION['Username'];
-$selected = $_GET['Selected'];
 
-$supplier = getSupplier();
+//-------------------------------------------------------------------------------------------------------
+//----- GETTING FROM DB AND NAME VARIABLES --------------------------------------------------------------
 
-//Getting selected stock items details
-$db = new SQLite3('/Applications/MAMP/db/IMS.db');
-$sql = "SELECT * FROM Stock WHERE Item_name = :Itemname";
-$stmt = $db->prepare($sql);
-$stmt->bindParam(':Itemname', $selected, SQLITE3_TEXT); 
-$result = $stmt->execute();
-$SelectedItem = [];
-while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
+$supplier = getSupplier();                   //Getting all suppliers info
 
-$N = $SelectedItem[0][0];
-$UnitPrice = $SelectedItem[0][2];
+$selected = $_GET['Selected'];               //Selected item
+$SelectedItem = getSelectedStock($selected); //getting all info for selected item
+$N = $SelectedItem[0][0];                    //Selected item name
+$UnitPrice = $SelectedItem[0][2];            //Selected item price per unit
 
+//-------------------------------------------------------------------------------------------------------
+//----- ADD ITEM TO ORDER -------------------------------------------------------------------------------
 
 //add item to Item_Order
 if (isset($_POST['Add'])) {
@@ -47,6 +44,8 @@ if (isset($_POST['Add'])) {
     $stmt->execute();
 }
 
+//-------------------------------------------------------------------------------------------------------
+//----- PLACING ORDER -----------------------------------------------------------------------------------
 
 //Placing Dairy order
 if (isset($_POST['PlaceDO'])) {
@@ -67,7 +66,8 @@ if (isset($_POST['PlaceFO'])) {
     placeOrder("Fruit / Veg",$total);
 }
 
-
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 
 ?>
 

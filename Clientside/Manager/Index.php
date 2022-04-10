@@ -3,6 +3,7 @@
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
+//session
 $path = "ManagerLogin.php";
 session_start(); 
 if (!isset($_SESSION['Username'])) {
@@ -10,7 +11,6 @@ if (!isset($_SESSION['Username'])) {
     session_destroy();
     header("Location:".$path);
 }
-$Name = $_SESSION['Username'];
 
 //-------------------------------------------------------------------------------------------------------
 //----- ADD NEW TAB -------------------------------------------------------------------------------------
@@ -26,6 +26,7 @@ $ItemNameError = $CategoryError = $UnitPoundsError = $UnitPenceError = $Threshol
 $allFields = "yes";
 if (isset($_POST['add'])) {
 
+    //Checking all fields are inputted
     if ($_POST['ItemName']=="")   {$ItemNameError = "Please enter the item name"; $allFields = "no";}
     if ($_POST['Category']=="")   {$CategoryError = "Please select a category";   $allFields = "no";}
     if ($_POST['UnitPounds']=="") {$UnitPoundsError = "Please enter pounds";      $allFields = "no";}
@@ -39,25 +40,16 @@ if (isset($_POST['add'])) {
 //-------------------------------------------------------------------------------------------------------
 //----- CURRENT STOCK / EDIT & DELETE -------------------------------------------------------------------
 
-$selected = $_GET['Selected'];
+$selected = $_GET['Selected'];                   //Selected item
+$SelectedItem = getSelectedStock($selected);     //getting all info for selected item
 
-//Getting selected stock items details
-$db = new SQLite3('/Applications/MAMP/db/IMS.db');
-$sql = "SELECT * FROM Stock WHERE Item_name = :Itemname";
-$stmt = $db->prepare($sql);
-$stmt->bindParam(':Itemname', $selected, SQLITE3_TEXT); 
-$result = $stmt->execute();
-$SelectedItem = [];
-while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
+if (isset($_POST['edit'])) {updateSelected();}   //update selected
+if (isset($_POST['delete'])) {deleteSelected();} //delete selected
 
-//update selected
-if (isset($_POST['edit'])) {updateSelected();}
-//delete selected
-if (isset($_POST['delete'])) {deleteSelected();}
+$AlertQ = FALSE;                                 //Set alert boolean 
+$AlertT = FALSE;                                 //Set alert boolean
 
 //insert quantity into selected
-$AlertQ = FALSE;
-$AlertT = FALSE;
 if (isset($_POST['insert'])) {
 
     //Subtracting insert quantity
@@ -65,6 +57,7 @@ if (isset($_POST['insert'])) {
     $InsertQ = $_POST['InsertQuantity'];
     $NewQ = $CurrentQ-$InsertQ;
 
+    //Selected item data
     $N = $SelectedItem[0][0];
     $Threshold = $SelectedItem[0][3];
     $Cat = $SelectedItem[0][1];
@@ -101,6 +94,9 @@ if (isset($_POST['insert'])) {
         header("Refresh:0");
     }
 }
+
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 
 ?>
 
@@ -160,8 +156,8 @@ if (isset($_POST['insert'])) {
                     <thead>
                         <th>Item Name</th>
                         <th>In Stock</th>
-                        <th>Category</th>
-                        <th>Threshold</th>    
+                        <th>Threshold</th> 
+                        <th>Category</th>   
                         <th>Unit Price</th>
                         <th>Select</th>
                     </thead>
@@ -173,8 +169,8 @@ if (isset($_POST['insert'])) {
                             <tr> 
                                 <td><?php echo $stock[$i]['Item_Name']?></td>
                                 <td><?php echo $stock[$i]['Quantity']?></td>  
-                                <td><?php echo $stock[$i]['Category']?></td>
                                 <td><?php echo $stock[$i]['Threshold']?>
+                                <td><?php echo $stock[$i]['Category']?></td>
                                 <td>£<?php echo number_format((($stock[$i]['Unit_Price'])/100),2)?></td>
                                 <td><a href="Index.php?Selected=<?php echo $stock[$i]['Item_Name'];?>"><button class="btn-select">select</button></a></td>
                             </tr>

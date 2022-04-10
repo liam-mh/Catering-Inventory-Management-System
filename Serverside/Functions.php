@@ -1,5 +1,6 @@
 <?php
 
+//Adds new item to Stock table
 function addNew() {
 
     //Unit price calculation
@@ -16,9 +17,9 @@ function addNew() {
     $stmt->bindParam(':UnitPrice', $UnitPrice, SQLITE3_INTEGER);
     $stmt->bindParam(':Threshold', $_POST['Threshold'], SQLITE3_INTEGER);
     $stmt->execute();
-
 }
 
+//Updates details of selected item in Stock table
 function updateSelected() {
 
     //Unit price calculation
@@ -44,6 +45,7 @@ function updateSelected() {
     header('Refresh:0');
 }
 
+//Removes selected item from Stock table
 function deleteSelected() {
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -52,8 +54,8 @@ function deleteSelected() {
     $stmt->bindParam(':Name', $selected, SQLITE3_TEXT);
     $stmt->execute();
     header("Location:Index.php?deleted=true");
-
 }
+
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
 
@@ -67,9 +69,22 @@ function getCurrentStock () {
     return $rows_array;
 }
 
+//Getting selected stock items details
+function getSelectedStock($selected) {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = "SELECT * FROM Stock WHERE Item_name = :Itemname";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':Itemname', $selected, SQLITE3_TEXT); 
+    $result = $stmt->execute();
+    $SelectedItem = [];
+    while($row=$result->fetchArray(SQLITE3_NUM)){$SelectedItem [] = $row;}
+    return $SelectedItem;
+}
+
 //-------------------------------------------------------------------------------------------------------
 //----- SUPPLIERS ---------------------------------------------------------------------------------------
 
+//Getting all supplier detials
 function getSupplier () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Supplier');
@@ -79,47 +94,37 @@ function getSupplier () {
     return $rows_array;
 }
 
-function updateDS() {
+//Updates suppliers name and email
+function updateSupplier($c,$n,$e) {
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 
        'UPDATE Supplier 
         SET Name=:Name, Email=:Email
-        WHERE Category="Dairy"';
+        WHERE Category=:Cat';
 
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',  $_POST['DN'], SQLITE3_TEXT);
-    $stmt->bindParam(':Email', $_POST['DE'], SQLITE3_TEXT);
+    $stmt->bindParam(':Name',  $n, SQLITE3_TEXT);
+    $stmt->bindParam(':Email', $e, SQLITE3_TEXT);
+    $stmt->bindParam(':Cat',  $c, SQLITE3_TEXT);
     $stmt->execute();
-    header('Location:Suppliers.php?updatedDairy=true"');
+
+    header('Refresh:0');
 }
-function updateMS() {
+
+//Getting logged in supplier category
+function getLoggedInSupplierCat($SupplierName) {
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 
-       'UPDATE Supplier 
-        SET Name=:Name, Email=:Email
-        WHERE Category="Meat / Fish"';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',  $_POST['MN'], SQLITE3_TEXT);
-    $stmt->bindParam(':Email', $_POST['ME'], SQLITE3_TEXT);
-    $stmt->execute();
-    header('Location:Suppliers.php?updatedMeat=true"');
-}
-function updateFS() {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 
-       'UPDATE Supplier 
-        SET Name=:Name, Email=:Email
-        WHERE Category="Fruit / Veg"';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name',  $_POST['FN'], SQLITE3_TEXT);
-    $stmt->bindParam(':Email', $_POST['FE'], SQLITE3_TEXT);
-    $stmt->execute();
-    header('Location:Suppliers.php?updatedFruitVeg=true"');
+    $sql = "SELECT * FROM Supplier WHERE Name = :Name";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':Name', $SupplierName, SQLITE3_TEXT); 
+    $result = $stmt->execute();
+    $supplier = [];
+    while($row=$result->fetchArray(SQLITE3_NUM)) {
+        $supplier [] = $row;
+    }
+    return $supplier;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -139,6 +144,7 @@ function getItemOrder ($c) {
     }
     return $ItemOrder;
 }
+
 //Getting low quantity Item_Order in supplier category
 function getAddedItemOrder ($c) {
     
@@ -153,6 +159,7 @@ function getAddedItemOrder ($c) {
     }
     return $ItemOrder;
 }
+
 //Getting Placed low quantity Item_Order in supplier category
 function getPlacedItemOrder ($c) {
     
@@ -210,73 +217,46 @@ function placeOrder ($c,$t) {
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Whole_Order 
-            SET Order_Date=:Date, Order_Total=:Total  
+            SET Order_Date="today", Order_Total=:Total  
             WHERE Category = :Cat';    
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Date',  $formatDate, SQLITE3_TEXT);
+    $stmt->bindParam(':D',     $date, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $t, SQLITE3_INTEGER);
     $stmt->bindParam(':Cat',   $c, SQLITE3_TEXT);
     $stmt->execute();
 }
 
+//Getting Order date from Whole_Order for logged in supplier
+function getOrderDate ($category) {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = "SELECT * FROM Whole_Order WHERE Category = :Cat";
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':Cat', $category[0][0], SQLITE3_TEXT); 
+    $result = $stmt->execute();
+    $OD = [];
+    while($row=$result->fetchArray(SQLITE3_NUM)) {
+        $OD [] = $row;
+    }
+    return $OD;
+}
 
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING PDFS ------------------------------------------------------------------------------------
 
-function getDairyPDF () {
+function getPDF ($c) {
+    
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM PDF WHERE Category = "Dairy"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
+    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY Date DESC';
+    $stmt = $db->prepare($sql);
+    $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
+    $result = $stmt->execute();
+    $PDF = [];
+    while($row=$result->fetchArray(SQLITE3_NUM)) {
+        $PDF [] = $row;
     }
-    return $rows_array;
+    return $PDF;
 }
-function getMeatPDF () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM PDF WHERE Category = "Meat / Fish"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getVegPDF () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM PDF WHERE Category = "Fruit / Veg"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-
-//-------------------------------------------------------------------------------------------------------
-//----- ORDERS ------------------------------------------------------------------------------------------
-
-function getDairyOrder () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Dairy"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getMeatOrder () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Meat / Fish"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-function getVegOrder () {
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Item_Order WHERE Category = "Fruit / Veg"');
-    while ($row=$rows->fetchArray()) {
-        $rows_array[]=$row;
-    }
-    return $rows_array;
-}
-
-
 
 
 ?>
