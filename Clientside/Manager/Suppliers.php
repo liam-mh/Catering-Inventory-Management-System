@@ -1,8 +1,11 @@
 <?php 
 
+//error_reporting(0);
+
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
+//session
 $path = "ManagerLogin.php";
 session_start(); 
 if (!isset($_SESSION['Username'])) {
@@ -10,15 +13,16 @@ if (!isset($_SESSION['Username'])) {
     session_destroy();
     header("Location:".$path);
 }
-$Name = $_SESSION['Username'];
 
+$supplier = getSupplier(); //Getting all supplier info
 
 //Updating suppliers
-if (isset($_POST['DApply'])) {updateDS();}
-if (isset($_POST['MApply'])) {updateMS();}
-if (isset($_POST['FApply'])) {updateFS();}
+if (isset($_POST['DApply'])) {updateSupplier("Dairy",      $_POST['DN'],$_POST['DE']);}
+if (isset($_POST['MApply'])) {updateSupplier("Meat / Fish",$_POST['MN'],$_POST['ME']);}
+if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['FE']);}
 
-$supplier = getSupplier();
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 
 ?>
 
@@ -61,13 +65,13 @@ $supplier = getSupplier();
                         </thead>
                         <tbody>
                             <?php 
-                            $PDF = getDairyPDF();
+                            $PDF = getPDF("Dairy");
                             for ($i=0; $i<count($PDF); $i++):     
                             ?>
                             <tr> 
-                                <td><?php echo $PDF[$i]['Date']?></td>                                                           
-                                <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td>£<?php echo number_format((($PDF[$i]['Order_Total'])/100),2)?></td>
+                                <td><?php echo $PDF[$i][0]?></td>                                                           
+                                <td><?php echo $PDF[$i][4]?></td>
+                                <td>£<?php echo number_format((($PDF[$i][3])/100),2)?></td>
                                 <!-- <td><a href="<?php //echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td> -->                                                            
                             </tr>
                             <?php endfor; ?>
@@ -106,13 +110,13 @@ $supplier = getSupplier();
                         </thead>
                         <tbody>
                             <?php 
-                            $PDF = getMeatPDF();
+                            $PDF = getPDF("Meat / Fish");
                             for ($i=0; $i<count($PDF); $i++):     
                             ?>
                             <tr> 
-                                <td><?php echo $PDF[$i]['Date']?></td>                                                           
-                                <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td>£<?php echo number_format((($PDF[$i]['Order_Total'])/100),2)?></td>
+                                <td><?php echo $PDF[$i][0]?></td>                                                           
+                                <td><?php echo $PDF[$i][4]?></td>
+                                <td>£<?php echo number_format((($PDF[$i][3])/100),2)?></td>
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -150,13 +154,13 @@ $supplier = getSupplier();
                         </thead>
                         <tbody>
                             <?php 
-                            $PDF = getVegPDF();
+                            $PDF = getPDF("Fruit / Veg");
                             for ($i=0; $i<count($PDF); $i++):     
                             ?>
                             <tr> 
-                                <td><?php echo $PDF[$i]['Date']?></td>                                                           
-                                <td><?php echo $PDF[$i]['Accept_Decline']?></td>
-                                <td>£<?php echo number_format((($PDF[$i]['Order_Total'])/100),2)?></td>
+                                <td><?php echo $PDF[$i][0]?></td>                                                           
+                                <td><?php echo $PDF[$i][4]?></td>
+                                <td>£<?php echo number_format((($PDF[$i][3])/100),2)?></td>
                             </tr>
                             <?php endfor; ?>
                         </tbody>
