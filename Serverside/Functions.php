@@ -134,7 +134,7 @@ function getLoggedInSupplierCat($SupplierName) {
 function getItemOrder ($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Placed IS NULL';
+    $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Placed IS NOT 1';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
     $result = $stmt->execute();
@@ -149,7 +149,7 @@ function getItemOrder ($c) {
 function getAddedItemOrder ($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Order_Quantity IS NOT NULL AND PLACED IS NULL';
+    $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Order_Quantity IS NOT NULL AND PLACED IS NOT 1';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
     $result = $stmt->execute();
@@ -164,7 +164,7 @@ function getAddedItemOrder ($c) {
 function getPlacedItemOrder ($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Order_Quantity IS NOT NULL';
+    $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Order_Quantity IS NOT NULL AND Placed = 1';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
     $result = $stmt->execute();
@@ -189,7 +189,7 @@ function TotalPIO ($c) {
 //Total of items order
 function TotalIO ($c) {
     
-    $g = getItemOrder($c);
+    $g = getAddedItemOrder($c);
     $sum = 0;
 
     for ($i=0; $i<count($g); $i++) {
@@ -247,7 +247,7 @@ function getOrderDate ($category) {
 function getPDF ($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY Date DESC';
+    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY PDF_Date DESC';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
     $result = $stmt->execute();

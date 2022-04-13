@@ -1,5 +1,7 @@
 <?php 
 
+//error_reporting(0);
+
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 

@@ -49,19 +49,19 @@ if (isset($_POST['Add'])) {
 
 //Placing Dairy order
 if (isset($_POST['PlaceDO'])) {
-
+    $AlertD = TRUE;
     $total = TotalIO("Dairy");
     placeOrder("Dairy",$total);
 }
 //Placing Meat / Fish order
 if (isset($_POST['PlaceMO'])) {
-
+    $AlertM = TRUE;
     $total = TotalIO("Meat / Fish");
     placeOrder("Meat / Fish",$total);
 }
 //Placing Fruit / Veg order
 if (isset($_POST['PlaceFO'])) {
-
+    $AlertF = TRUE;
     $total = TotalIO("Fruit / Veg");
     placeOrder("Fruit / Veg",$total);
 }
@@ -141,6 +141,13 @@ if (isset($_POST['PlaceFO'])) {
                                 <input class="btn btn-main" style="width:50%" type="submit" value="PLACE ORDER" name="PlaceDO"></input> 
                             </div> 
                         </form>
+                        <!-- ALERT: Order Placed -->
+                        <?php if ($AlertD == TRUE): ?>
+                            <br>
+                            <div class="alert alert-success showcol-10" role="alert" style="font-weight: bold;">
+                                Dairy Order Placed
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>
@@ -208,6 +215,13 @@ if (isset($_POST['PlaceFO'])) {
                                 <input class="btn btn-main" style="width:50%" type="submit" value="PLACE ORDER" name="PlaceMO"></input> 
                             </div> 
                         </form>
+                        <!-- ALERT: Order Placed -->
+                        <?php if ($AlertM == TRUE): ?>
+                            <br>
+                            <div class="alert alert-success showcol-10" role="alert" style="font-weight: bold;">
+                                Meat / Fish Order Placed
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>
@@ -275,6 +289,13 @@ if (isset($_POST['PlaceFO'])) {
                                 <input class="btn btn-main" style="width:50%" type="submit" value="PLACE ORDER" name="PlaceFO"></input> 
                             </div> 
                         </form>
+                        <!-- ALERT: Order Placed -->
+                        <?php if ($AlertF == TRUE): ?>
+                            <br>
+                            <div class="alert alert-success showcol-10" role="alert" style="font-weight: bold;">
+                                Fruit / Veg Order Placed
+                            </div>
+                        <?php endif; ?>
                     </div>
 
                 </div>

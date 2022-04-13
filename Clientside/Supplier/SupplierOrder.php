@@ -19,48 +19,46 @@ if (!isset($_SESSION['Username'])) {
 
 $SupplierName = $_SESSION['Username'];             //Logged in supplier
 $category = getLoggedInSupplierCat($SupplierName); //Getting logged in supplier category
+$c = $category[0][0];                              //Current category from array
 $orderDate = getOrderDate ($category);             //Getting Order date from Whole_Order for logged in supplier
 
 $total = TotalPIO($category[0][0]);                //order total for logged in category
-$IO = getPlacedItemOrder($category[0][0]);         //Getting all times placed in order 
+$PIO = getPlacedItemOrder($category[0][0]);        //Getting all times placed in order 
 
 //-------------------------------------------------------------------------------------------------------
 //----- ACCEPT / DECLINE ORDERS -------------------------------------------------------------------------
 
-//Current date variable
-$date  = new DateTime(); 
-$formatDate = $date->format('d/m/y');
-
 //accept
 if (isset($_POST['accept'])) {
 
-    AcceptOrder($category, $total, $IO);
+    $AD = "Accepted";
+    AcceptOrder($c, $total, $PIO, $AD);
 }
 
 
-function AcceptOrder($category, $total, $IO) {
+function AcceptOrder($category, $total, $PIO, $AD) {
 
-    echo "accepted order";
-    //Inserting result into PDF table
     //current date 
     $date  = new DateTime(); 
-    $formatDate = $date->format('d/m/y');
+    $d = $date->format('d/m/y');
     
+    //Inserting result into PDF table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO PDF (Date, Category, Order_Total, Accept_Decline) 
-            VALUES ("today", :Cat, :Total, "Accepted")';
+    $sql = 'INSERT INTO PDF (PDF_Date, Category, Order_Total, Accept_Decline) 
+            VALUES (:D, :Cat, :Total, :AD)';
     $stmt = $db->prepare($sql); 
-    //$stmt->bindParam(':D',     $formatDate, SQLITE3_TEXT);
+    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
     $stmt->bindParam(':Cat',   $category, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $total, SQLITE3_INTEGER);
+    $stmt->bindParam(':AD',    $AD, SQLITE3_TEXT);
     $stmt->execute();
 
     //Adding stock to Stock table 
-    for ($i=0; $i<count($IO); $i++) {
+    for ($i=0; $i<count($PIO); $i++) {
 
         //variables for name and quantity of placed order
-        $Name = $IO[$i][0];
-        $AcceptQuantity = $IO[$i][1];
+        $Name = $PIO[$i][0];
+        $AcceptQuantity = $PIO[$i][1];
 
         //Getting remaining stock from stock table
         $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -89,17 +87,10 @@ function AcceptOrder($category, $total, $IO) {
         $stmt = $db->prepare($sql); 
         $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
         $stmt->execute();
-
-        /*
-        //Removing date from Whole_Order
-        $sql = 'UPDATE Whole_Order 
-                SET Order_Date="NO CURRENT ORDERS" 
-                WHERE Category=:Cat';
-        $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Cat', $category, SQLITE3_TEXT);
-        $stmt->execute();
-        */
     }     
+
+    //Updating whole order
+    updateWhole_Order("NO CURRENT ORDERS", $total, $category);
 
     header("Refresh:0");
     header("Location:SupplierOrder.php?Order=A");
@@ -107,67 +98,69 @@ function AcceptOrder($category, $total, $IO) {
 
 
 
-$c = $category[0][0];
 
-/*
+
 //decline
 if (isset($_POST['decline'])) {
 
-    DeclineOrder($c, $total, $formatDate);
+    $AD = "Declined";
+    DeclineOrder($c, $total, $AD, $PIO);
 }
 
-function DeclineOrder($c, $t, $d) {
+function DeclineOrder($c, $t, $AD, $PIO) {
+
+    //current date 
+    $date  = new DateTime(); 
+    $d = $date->format('d/m/y');
 
     //Inserting result into PDF table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO PDF (Date, Category, Order_Total, Accept_Decline) 
-            VALUES (:Date, :Cat, :Total, "Declined")';
-
+    $sql = 'INSERT INTO PDF (PDF_Date, Category, Order_Total, Accept_Decline) 
+            VALUES (:D, :Cat, :Total, :AD)';
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Date',  $d, SQLITE3_TEXT);
+    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
     $stmt->bindParam(':Cat',   $c, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $t, SQLITE3_INTEGER);
+    $stmt->bindParam(':AD',    $AD, SQLITE3_TEXT);
     $stmt->execute();
 
-    //Updating Whole_Order table
-    $sql = 'UPDATE Whole_Order 
-            SET Order_Date = "NO CURRENT ORDERS"
-            WHERE Category = $Cat';
+    //Changing placed order items to 0 in Item_Order table
+    for ($i=0; $i<count($PIO); $i++) {
 
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Cat', $c, SQLITE3_TEXT);
-    $stmt->execute();
+        //variables for name of placed order
+        $Name = $PIO[$i][0];
+        echo $Name;
+
+        //updating Order_Item table
+        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+        $sql = 'UPDATE Item_Order 
+                SET Order_Quantity=NULL, Placed=0   
+                WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
+        $stmt->execute();
+    }
+
+    //Updating whole order
+    updateWhole_Order("NO CURRENT ORDERS", $total, $c);
 
     header("Refresh:0");
     header("Location:SupplierOrder.php?Order=D"); 
     
 }
-*/
 
-if (isset($_POST['decline'])) {
+function updateWhole_Order($d, $t, $c) {
 
-    //Inserting result into PDF table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO PDF (Date, Category, Order_Total, Accept_Decline) 
-            VALUES (:Date, :Cat, :Total, "Declined")';
-
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Date',  $formatDate, SQLITE3_TEXT);
-    $stmt->bindParam(':Cat',   $c, SQLITE3_TEXT);
-    $stmt->bindParam(':Total', $total, SQLITE3_INTEGER);
-    $stmt->execute();
-
-    //Updating Whole_Order table
     $sql = 'UPDATE Whole_Order 
-            SET Order_Date = "NO CURRENT ORDERS"
-            WHERE Category = $Cat';
-
+            SET Order_Date=:D, Order_Total=:T
+            WHERE Category=:C';
+       
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Cat', $c, SQLITE3_TEXT);
+    $stmt->bindParam(':D',  $d, SQLITE3_TEXT);
+    $stmt->bindParam(':T',  $t, SQLITE3_INTEGER);
+    $stmt->bindParam(':C',  $c, SQLITE3_TEXT);
     $stmt->execute();
-
-    header("Refresh:0");
-    header("Location:SupplierOrder.php?Order=D"); 
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -210,12 +203,12 @@ if (isset($_POST['decline'])) {
                         </thead>
                         <tbody>
                             <?php 
-                            for ($i=0; $i<count($IO); $i++):     
+                            for ($i=0; $i<count($PIO); $i++):     
                             ?>
                             <tr> 
-                                <td><?php echo $IO[$i][0]?></td>                                                           
-                                <td><?php echo $IO[$i][1]?></td> 
-                                <td>£<?php echo number_format((($IO[$i][3])/100),2)?></td> 
+                                <td><?php echo $PIO[$i][0]?></td>                                                           
+                                <td><?php echo $PIO[$i][1]?></td> 
+                                <td>£<?php echo number_format((($PIO[$i][3])/100),2)?></td> 
                             </tr>
                             <?php endfor; ?>
                         </tbody>
