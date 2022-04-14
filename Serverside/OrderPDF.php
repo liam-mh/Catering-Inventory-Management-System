@@ -52,12 +52,11 @@ function supplierPDF($category) {
         $getPDF [] = $row;
     }
     $date = $getPDF[0][0];
+    $ID = $getPDF[0][5];
     $AD = strtoupper($getPDF[0][4]);
 
     //creating filename and directory
-    $directory = "/Applications/MAMP/htdocs/IMS/Serverside/PDF_Store";
-    $filename = $category."Order".$date.".pdf";
-    //$_SERVER['DOCUMENT_ROOT']
+    $serverside = "/Applications/MAMP/htdocs/IMS/Serverside/PDF_Store/"."Invoice_".$ID.".pdf";
 
     //-------------------------------------------------------------------------------------------------------
     //----- PDF FUNCTIONS -----------------------------------------------------------------------------------
@@ -143,10 +142,8 @@ function supplierPDF($category) {
     $pdf->Cell(25,5,$AD,0,0);
     $pdf->Cell(0,5,$date,0,1);
 
-    $pdf->Output('D', $filename);
-    //$pdf->Output('F', "/Applications/MAMP/htdocs/IMS/Serverside/PDF_Store/{$filename}");
-    //$pdf->Output('F', "/Applications/MAMP/htdocs/IMS/Serverside/PDF_Store/test.pdf");
-
+    //Saves a copy of PDF to folder in server
+    $pdf->Output('F', $serverside);
 }
 
 ?>
