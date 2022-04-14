@@ -62,6 +62,7 @@ function deleteSelected() {
     $stmt = $db->prepare($sql); 
     $stmt->bindParam(':Name', $selected, SQLITE3_TEXT);
     $stmt->execute();
+
     header("Location:Index.php?deleted=true");
 }
 
@@ -208,6 +209,7 @@ function TotalIO ($c) {
 }
 
 //places order from Item_Order to Whole_Order and updates Placed to 1
+include("OrderPDF.php");
 function placeOrder ($c,$t) {
 
     //updating Order_Item table
@@ -222,14 +224,14 @@ function placeOrder ($c,$t) {
     //Adding details to Order table
     //current date 
     $date  = new DateTime(); 
-    $formatDate = $date->format('d/m/y');
+    $d = $date->format('d/m/y');
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Whole_Order 
-            SET Order_Date="today", Order_Total=:Total  
+            SET Order_Date=:D, Order_Total=:Total  
             WHERE Category = :Cat';    
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':D',     $date, SQLITE3_TEXT);
+    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $t, SQLITE3_INTEGER);
     $stmt->bindParam(':Cat',   $c, SQLITE3_TEXT);
     $stmt->execute();
@@ -270,6 +272,8 @@ function OrderAD($category, $total, $PIO, $AD) {
     $stmt->bindParam(':Total', $total, SQLITE3_INTEGER);
     $stmt->bindParam(':AD',    $AD, SQLITE3_TEXT);
     $stmt->execute();
+
+    supplierPDF($category);
 
     //Updating tables for each item
     for ($i=0; $i<count($PIO); $i++) {
@@ -325,8 +329,10 @@ function OrderAD($category, $total, $PIO, $AD) {
     updateWhole_Order("NO CURRENT ORDERS", $total, $category);
 
     //Setting header
-    header("Refresh:0");
-    header("Location:SupplierOrder.php?Order=$AD");
+    //header("Refresh:0");
+    //header("Location:SupplierOrder.php?Order=$AD");
+
+    
 }
 
 //Updates Whole_Order table
@@ -347,10 +353,10 @@ function updateWhole_Order($d, $t, $c) {
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING PDFS ------------------------------------------------------------------------------------
 
-function getPDF ($c) {
+function getPDF($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY PDF_Date DESC';
+    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY PDF_ID DESC';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
     $result = $stmt->execute();

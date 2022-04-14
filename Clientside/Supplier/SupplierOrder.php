@@ -4,6 +4,7 @@
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
+//include("../../Serverside/OrderPDF.php");
 
 //session
 $path = "SupplierLogin.php";
@@ -91,7 +92,7 @@ if (isset($_POST['decline'])) {                    //Decline
                     <br>
                     <p>ORDER TOTAL: £<?php echo number_format((($total)/100),2); ?></p>
 
-                    <!-- Accept and Decline buttons -->
+                    <!-- Accept and Decline buttons -->                    
                     <form method="post">
                         <div class="row">
                             <div class="col" style="text-align:center">  
@@ -103,7 +104,8 @@ if (isset($_POST['decline'])) {                    //Decline
                         </div> 
                     </form>
 
-                    <a class="nav-link" href="../../Serverside/OrderPDF.php?Category=<?php echo $category ?>" target="_blank">(PDF)</a>
+                    <p>Accepting or Declining an order will generate a confirmation PDF and will log you out.</p>
+                
                 </div>
             </div> 
             
