@@ -224,7 +224,7 @@ function placeOrder ($c,$t) {
     //Adding details to Order table
     //current date 
     $date  = new DateTime(); 
-    $d = $date->format('d/m/y');
+    $d = $date->format('d-m-y');
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Whole_Order 
@@ -260,7 +260,7 @@ function OrderAD($category, $total, $PIO, $AD) {
 
     //current date 
     $date  = new DateTime(); 
-    $d = $date->format('d/m/y');
+    $d = $date->format('d-m-y');
     
     //Inserting result into PDF table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -329,8 +329,7 @@ function OrderAD($category, $total, $PIO, $AD) {
     updateWhole_Order("NO CURRENT ORDERS", $total, $category);
 
     //Setting header
-    //header("Refresh:0");
-    //header("Location:SupplierOrder.php?Order=$AD");
+    header("Location:SupplierOrder.php?Order=$AD");
 
     
 }
@@ -351,8 +350,9 @@ function updateWhole_Order($d, $t, $c) {
 }
 
 //-------------------------------------------------------------------------------------------------------
-//----- GETTING PDFS ------------------------------------------------------------------------------------
+//----- PDFS --------------------------------------------------------------------------------------------
 
+//gets PDF in most recent order by category
 function getPDF($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
@@ -365,6 +365,15 @@ function getPDF($c) {
         $PDF [] = $row;
     }
     return $PDF;
+}
+
+//Opens saved PDF orders by selecting their Invoice Number
+function readPDF($ID) {
+
+    $filename = "/Applications/MAMP/htdocs/IMS/Serverside/PDF_Store/Invoice_".$ID.".pdf";
+    header("Content-type: application/pdf");
+    header("Content-Length: " . filesize($filename));
+    readfile($filename);
 }
 
 //-------------------------------------------------------------------------------------------------------
