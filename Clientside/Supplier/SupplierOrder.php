@@ -4,6 +4,7 @@
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
+//include("../../Serverside/OrderPDF.php");
 
 //session
 $path = "SupplierLogin.php";
@@ -28,139 +29,14 @@ $PIO = getPlacedItemOrder($category[0][0]);        //Getting all times placed in
 //-------------------------------------------------------------------------------------------------------
 //----- ACCEPT / DECLINE ORDERS -------------------------------------------------------------------------
 
-//accept
-if (isset($_POST['accept'])) {
-
+if (isset($_POST['accept'])) {                     //Accept
     $AD = "Accepted";
-    AcceptOrder($c, $total, $PIO, $AD);
+    OrderAD($c, $total, $PIO, $AD);
 }
 
-
-function AcceptOrder($category, $total, $PIO, $AD) {
-
-    //current date 
-    $date  = new DateTime(); 
-    $d = $date->format('d/m/y');
-    
-    //Inserting result into PDF table
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO PDF (PDF_Date, Category, Order_Total, Accept_Decline) 
-            VALUES (:D, :Cat, :Total, :AD)';
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
-    $stmt->bindParam(':Cat',   $category, SQLITE3_TEXT);
-    $stmt->bindParam(':Total', $total, SQLITE3_INTEGER);
-    $stmt->bindParam(':AD',    $AD, SQLITE3_TEXT);
-    $stmt->execute();
-
-    //Adding stock to Stock table 
-    for ($i=0; $i<count($PIO); $i++) {
-
-        //variables for name and quantity of placed order
-        $Name = $PIO[$i][0];
-        $AcceptQuantity = $PIO[$i][1];
-
-        //Getting remaining stock from stock table
-        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-        $sql = 'SELECT Quantity FROM Stock WHERE Item_Name=:Name';
-        $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
-        $result = $stmt->execute();
-        $oldQ = [];
-        while($row=$result->fetchArray(SQLITE3_NUM)){$oldQ [] = $row;}
-        $OQ = $oldQ[0][0];
-
-        //Adding new quantity onto remaining stock
-        $total = $OQ + $AcceptQuantity;
-
-        //Inserting new qauntity into Stock table
-        $sql = 'UPDATE Stock 
-                SET Quantity=:Quantity 
-                WHERE Item_Name=:Name';
-        $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Name',     $Name, SQLITE3_TEXT);
-        $stmt->bindParam(':Quantity', $total, SQLITE3_INTEGER);
-        $stmt->execute();
-
-        //Removing items from Item_Order table as back above threshold
-        $sql = 'DELETE FROM Item_Order WHERE Item_Name=:Name';
-        $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
-        $stmt->execute();
-    }     
-
-    //Updating whole order
-    updateWhole_Order("NO CURRENT ORDERS", $total, $category);
-
-    header("Refresh:0");
-    header("Location:SupplierOrder.php?Order=A");
-}
-
-
-
-
-
-//decline
-if (isset($_POST['decline'])) {
-
+if (isset($_POST['decline'])) {                    //Decline
     $AD = "Declined";
-    DeclineOrder($c, $total, $AD, $PIO);
-}
-
-function DeclineOrder($c, $t, $AD, $PIO) {
-
-    //current date 
-    $date  = new DateTime(); 
-    $d = $date->format('d/m/y');
-
-    //Inserting result into PDF table
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO PDF (PDF_Date, Category, Order_Total, Accept_Decline) 
-            VALUES (:D, :Cat, :Total, :AD)';
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
-    $stmt->bindParam(':Cat',   $c, SQLITE3_TEXT);
-    $stmt->bindParam(':Total', $t, SQLITE3_INTEGER);
-    $stmt->bindParam(':AD',    $AD, SQLITE3_TEXT);
-    $stmt->execute();
-
-    //Changing placed order items to 0 in Item_Order table
-    for ($i=0; $i<count($PIO); $i++) {
-
-        //variables for name of placed order
-        $Name = $PIO[$i][0];
-        echo $Name;
-
-        //updating Order_Item table
-        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-        $sql = 'UPDATE Item_Order 
-                SET Order_Quantity=NULL, Placed=0   
-                WHERE Item_Name=:Name';
-        $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
-        $stmt->execute();
-    }
-
-    //Updating whole order
-    updateWhole_Order("NO CURRENT ORDERS", $total, $c);
-
-    header("Refresh:0");
-    header("Location:SupplierOrder.php?Order=D"); 
-    
-}
-
-function updateWhole_Order($d, $t, $c) {
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Whole_Order 
-            SET Order_Date=:D, Order_Total=:T
-            WHERE Category=:C';
-       
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':D',  $d, SQLITE3_TEXT);
-    $stmt->bindParam(':T',  $t, SQLITE3_INTEGER);
-    $stmt->bindParam(':C',  $c, SQLITE3_TEXT);
-    $stmt->execute();
+    OrderAD($c, $total, $PIO, $AD);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -179,13 +55,13 @@ function updateWhole_Order($d, $t, $c) {
             <div class="col-md-5">
                 
                 <!-- ALERT: Accepted order -->
-                <?php if ($_GET['Order'] == "A"): ?>
+                <?php if ($_GET['Order'] == "Accepted"): ?>
                     <div class="alert alert-success showcol-10" role="alert" style="font-weight: bold;">
                         Order Accepted
                     </div>
                 <?php endif; ?>
                 <!-- ALERT: Declined order -->
-                <?php if ($_GET['Order'] == "D"): ?>
+                <?php if ($_GET['Order'] == "Declined"): ?>
                     <div class="alert alert-danger showcol-10" role="alert" style="font-weight: bold;">
                         Order Declined
                     </div>
@@ -216,7 +92,7 @@ function updateWhole_Order($d, $t, $c) {
                     <br>
                     <p>ORDER TOTAL: £<?php echo number_format((($total)/100),2); ?></p>
 
-                    <!-- Accept and Decline buttons -->
+                    <!-- Accept and Decline buttons -->                    
                     <form method="post">
                         <div class="row">
                             <div class="col" style="text-align:center">  
@@ -228,7 +104,8 @@ function updateWhole_Order($d, $t, $c) {
                         </div> 
                     </form>
 
-                    <a class="nav-link" href="../../Serverside/OrderPDF.php?Category=<?php echo $category ?>" target="_blank">(PDF)</a>
+                    <p>Accepting or Declining an order will generate a confirmation PDF and will log you out.</p>
+                
                 </div>
             </div> 
             

@@ -47,20 +47,19 @@ if (isset($_POST['Add'])) {
 //-------------------------------------------------------------------------------------------------------
 //----- PLACING ORDER -----------------------------------------------------------------------------------
 
-//Placing Dairy order
-if (isset($_POST['PlaceDO'])) {
+if (isset($_POST['PlaceDO'])) {         //Placing Dairy order
     $AlertD = TRUE;
     $total = TotalIO("Dairy");
     placeOrder("Dairy",$total);
 }
-//Placing Meat / Fish order
-if (isset($_POST['PlaceMO'])) {
+
+if (isset($_POST['PlaceMO'])) {         //Placing Meat / Fish order
     $AlertM = TRUE;
     $total = TotalIO("Meat / Fish");
     placeOrder("Meat / Fish",$total);
 }
-//Placing Fruit / Veg order
-if (isset($_POST['PlaceFO'])) {
+
+if (isset($_POST['PlaceFO'])) {         //Placing Fruit / Veg order
     $AlertF = TRUE;
     $total = TotalIO("Fruit / Veg");
     placeOrder("Fruit / Veg",$total);

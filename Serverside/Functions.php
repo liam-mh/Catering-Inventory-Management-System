@@ -1,5 +1,14 @@
 <?php
 
+//-------------------------------------------------------------------------------------------------------
+//----- This page contains most functions used throughout the system ------------------------------------
+//----- Functions are split by generalised catagory, not by specific pages ------------------------------
+//-------------------------------------------------------------------------------------------------------
+
+
+//-------------------------------------------------------------------------------------------------------
+//----- ADD NEW / EDIT STOCK ----------------------------------------------------------------------------
+
 //Adds new item to Stock table
 function addNew() {
 
@@ -53,6 +62,7 @@ function deleteSelected() {
     $stmt = $db->prepare($sql); 
     $stmt->bindParam(':Name', $selected, SQLITE3_TEXT);
     $stmt->execute();
+
     header("Location:Index.php?deleted=true");
 }
 
@@ -199,6 +209,7 @@ function TotalIO ($c) {
 }
 
 //places order from Item_Order to Whole_Order and updates Placed to 1
+include("OrderPDF.php");
 function placeOrder ($c,$t) {
 
     //updating Order_Item table
@@ -213,14 +224,14 @@ function placeOrder ($c,$t) {
     //Adding details to Order table
     //current date 
     $date  = new DateTime(); 
-    $formatDate = $date->format('d/m/y');
+    $d = $date->format('d/m/y');
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'UPDATE Whole_Order 
-            SET Order_Date="today", Order_Total=:Total  
+            SET Order_Date=:D, Order_Total=:Total  
             WHERE Category = :Cat';    
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':D',     $date, SQLITE3_TEXT);
+    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
     $stmt->bindParam(':Total', $t, SQLITE3_INTEGER);
     $stmt->bindParam(':Cat',   $c, SQLITE3_TEXT);
     $stmt->execute();
@@ -242,12 +253,110 @@ function getOrderDate ($category) {
 }
 
 //-------------------------------------------------------------------------------------------------------
+//----- SUPPLIER ORDERS ---------------------------------------------------------------------------------
+
+//Updates PDF, Whole_Order, Stock and Item_Order when supplier either accepts or declines a placed order
+function OrderAD($category, $total, $PIO, $AD) {
+
+    //current date 
+    $date  = new DateTime(); 
+    $d = $date->format('d/m/y');
+    
+    //Inserting result into PDF table
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'INSERT INTO PDF (PDF_Date, Category, Order_Total, Accept_Decline) 
+            VALUES (:D, :Cat, :Total, :AD)';
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':D',     $d, SQLITE3_TEXT);
+    $stmt->bindParam(':Cat',   $category, SQLITE3_TEXT);
+    $stmt->bindParam(':Total', $total, SQLITE3_INTEGER);
+    $stmt->bindParam(':AD',    $AD, SQLITE3_TEXT);
+    $stmt->execute();
+
+    supplierPDF($category);
+
+    //Updating tables for each item
+    for ($i=0; $i<count($PIO); $i++) {
+
+        //variables for name and quantity of placed order
+        $Name = $PIO[$i][0];
+        $AcceptQuantity = $PIO[$i][1];
+
+        if ($AD == "Declined") {
+
+            //updating Order_Item table
+            $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+            $sql = 'UPDATE Item_Order 
+                    SET Order_Quantity=NULL, Placed=0   
+                    WHERE Item_Name=:Name';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
+            $stmt->execute();
+
+        } elseif ($AD == "Accepted") {
+
+            //Getting remaining stock from stock table
+            $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+            $sql = 'SELECT Quantity FROM Stock WHERE Item_Name=:Name';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
+            $result = $stmt->execute();
+            $oldQ = [];
+            while($row=$result->fetchArray(SQLITE3_NUM)){$oldQ [] = $row;}
+            $OQ = $oldQ[0][0];
+
+            //Adding new quantity onto remaining stock
+            $total = $OQ + $AcceptQuantity;
+
+            //Inserting new qauntity into Stock table
+            $sql = 'UPDATE Stock 
+                    SET Quantity=:Quantity 
+                    WHERE Item_Name=:Name';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':Name',     $Name, SQLITE3_TEXT);
+            $stmt->bindParam(':Quantity', $total, SQLITE3_INTEGER);
+            $stmt->execute();
+
+            //Removing items from Item_Order table as back above threshold
+            $sql = 'DELETE FROM Item_Order WHERE Item_Name=:Name';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':Name', $Name, SQLITE3_TEXT);
+            $stmt->execute();   
+        }
+    }
+
+    //Updating whole order
+    updateWhole_Order("NO CURRENT ORDERS", $total, $category);
+
+    //Setting header
+    //header("Refresh:0");
+    //header("Location:SupplierOrder.php?Order=$AD");
+
+    
+}
+
+//Updates Whole_Order table
+function updateWhole_Order($d, $t, $c) {
+
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $sql = 'UPDATE Whole_Order 
+            SET Order_Date=:D, Order_Total=:T
+            WHERE Category=:C';
+       
+    $stmt = $db->prepare($sql); 
+    $stmt->bindParam(':D',  $d, SQLITE3_TEXT);
+    $stmt->bindParam(':T',  $t, SQLITE3_INTEGER);
+    $stmt->bindParam(':C',  $c, SQLITE3_TEXT);
+    $stmt->execute();
+}
+
+//-------------------------------------------------------------------------------------------------------
 //----- GETTING PDFS ------------------------------------------------------------------------------------
 
-function getPDF ($c) {
+function getPDF($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY PDF_Date DESC';
+    $sql = 'SELECT * FROM PDF WHERE Category = :Cat ORDER BY PDF_ID DESC';
     $stmt = $db->prepare($sql);
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT); 
     $result = $stmt->execute();
@@ -258,5 +367,7 @@ function getPDF ($c) {
     return $PDF;
 }
 
+//-------------------------------------------------------------------------------------------------------
+//-------------------------------------------------------------------------------------------------------
 
 ?>

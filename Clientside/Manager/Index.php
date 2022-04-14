@@ -17,7 +17,7 @@ if (!isset($_SESSION['Username'])) {
 
 //Add new tab being selected
 $AddNew = FALSE;
-if (isset($_POST['AddNew'])) $AddNew = TRUE;
+if (isset($_POST['AddNew'])) {$AddNew = TRUE;}
 
 //Setting error variables
 $ItemNameError = $CategoryError = $UnitPoundsError = $UnitPenceError = $ThresholdError = ""; 
@@ -52,6 +52,11 @@ $AlertT = FALSE;                                 //Set alert boolean
 //insert quantity into selected
 if (isset($_POST['insert'])) {
 
+    insertStock($SelectedItem);
+}
+
+function insertStock($SelectedItem) {
+
     //Subtracting insert quantity
     $CurrentQ = $SelectedItem[0][4];
     $InsertQ = $_POST['InsertQuantity'];
@@ -66,6 +71,7 @@ if (isset($_POST['insert'])) {
 
         //insert number larger than current stock alert
         $AlertQ = TRUE; 
+        return $AlertQ;
 
     } else {
 
@@ -89,6 +95,8 @@ if (isset($_POST['insert'])) {
             $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
             $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
             $stmt->execute();  
+
+            return $AlertT;
         }
 
         header("Refresh:0");
