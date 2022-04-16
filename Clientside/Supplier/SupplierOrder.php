@@ -32,11 +32,11 @@ $PDF_ID = $getPDF[0][5];                           //Most recent PDF's ID number
 
 if (isset($_POST['accept'])) {                     //Accept order
     $AD = "Accepted";
-    OrderAD($c, $total, $PIO, $AD);
+    OrderAD($c, $total, $PIO, $AD, $SupplierName);
 }
 if (isset($_POST['decline'])) {                    //Decline order
     $AD = "Declined";
-    OrderAD($c, $total, $PIO, $AD);
+    OrderAD($c, $total, $PIO, $AD, $SupplierName);
 }
 
 if (isset($_POST['PDF'])) {readPDF($PDF_ID);}      //Show most recent PDF
