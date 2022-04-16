@@ -4,6 +4,7 @@
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
+include("../../Serverside/phpmailer/email.php");
 
 //session
 $path = "ManagerLogin.php";
@@ -49,20 +50,23 @@ if (isset($_POST['Add'])) {
 
 if (isset($_POST['PlaceDO'])) {         //Placing Dairy order
     $AlertD = TRUE;
-    $total = TotalIO("Dairy");
-    placeOrder("Dairy",$total);
+    $total = TotalIO($supplier[0][0]);
+    placeOrder($supplier[0][0],$total);
+    sendEmail($supplier[0][0], $supplier[0][1]);
 }
 
 if (isset($_POST['PlaceMO'])) {         //Placing Meat / Fish order
     $AlertM = TRUE;
-    $total = TotalIO("Meat / Fish");
-    placeOrder("Meat / Fish",$total);
+    $total = TotalIO($supplier[1][0]);
+    placeOrder($supplier[1][0],$total);
+    sendEmail($supplier[1][0], $supplier[1][1]);
 }
 
 if (isset($_POST['PlaceFO'])) {         //Placing Fruit / Veg order
     $AlertF = TRUE;
-    $total = TotalIO("Fruit / Veg");
-    placeOrder("Fruit / Veg",$total);
+    $total = TotalIO($supplier[2][0]);
+    placeOrder($supplier[2][0],$total);
+    sendEmail($supplier[2][0], $supplier[2][1]);
 }
 
 //-------------------------------------------------------------------------------------------------------
