@@ -75,7 +75,7 @@ if (isset($_POST['PlaceFO'])) {         //Placing Fruit / Veg order
 ?>
 
 <body>
-    <?php require("ManagerNavbar.php");?>
+    <?php nav("order");?>
     <div class="container">
 
     <div style="text-align:center">  

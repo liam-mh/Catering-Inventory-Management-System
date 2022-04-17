@@ -2,6 +2,7 @@
 
 //error_reporting(0);
 
+$NavS = "-selected";
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
@@ -27,7 +28,7 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
 ?>
 
 <body>
-    <?php require("ManagerNavbar.php");?>
+    <?php nav("supplier");?>
     <div class="container">
 
     <div style="text-align:center">  

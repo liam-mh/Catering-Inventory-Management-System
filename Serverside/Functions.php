@@ -6,7 +6,7 @@
 */
 
 //-------------------------------------------------------------------------------------------------------
-//----- ADD NEW / EDIT STOCK ----------------------------------------------------------------------------
+//----- ADD NEW / EDIT STOCK / INSERT STOCK -------------------------------------------------------------
 
 //Adds new item to Stock table
 function addNew() {
@@ -74,6 +74,52 @@ function deleteSelected() {
     $stmt->execute();
 
     header("Location:Index.php?deleted=true");
+}
+
+//Inserts used stock input into stock table
+function insertStock($SelectedItem) {
+
+    //Subtracting insert quantity
+    $CurrentQ = $SelectedItem[0][4];
+    $InsertQ = $_POST['InsertQuantity'];
+    $NewQ = $CurrentQ-$InsertQ;
+
+    //Selected item data
+    $N = $SelectedItem[0][0];
+    $Threshold = $SelectedItem[0][3];
+    $Cat = $SelectedItem[0][1];
+
+    //Number inserted larger than current stock 
+    if ($NewQ < 0) {
+
+        $AlertQ = TRUE; 
+
+    } else {
+
+        //Updating quantity
+        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+        $sql = 'UPDATE Stock SET Quantity=:NewQ WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name', $N, SQLITE3_TEXT);
+        $stmt->bindParam(':NewQ', $NewQ, SQLITE3_INTEGER);
+        $stmt->execute();  
+
+        //Add item to Item_Order table if below threshold
+        if ($NewQ < $Threshold) {
+
+            $AlertT = TRUE;
+
+            $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+            $sql = 'INSERT INTO Item_Order (Item_Name, Category) 
+                    VALUES (:ItemName, :Category)';
+            $stmt = $db->prepare($sql); 
+            $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
+            $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
+            $stmt->execute();  
+        }
+    }
+
+    return array($AlertQ, $AlertT);
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -402,6 +448,93 @@ function readPDF($ID) {
     header("Content-type: application/pdf");
     header("Content-Length: " . filesize($filename));
     readfile($filename);
+}
+
+//-------------------------------------------------------------------------------------------------------
+//----- NAVBAR ------------------------------------------------------------------------------------------
+
+//Provides a nav bar with highlighted page buttons
+function nav($page) {
+
+    echo
+    '<!doctype html>
+    <html>
+    <head>
+        <title>Inventory Managemement </title>
+        
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+        <!-- Bootstrap CSS -->
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous"> 
+        <link rel="stylesheet" href="/IMS/site.css">
+    </head>
+    
+    <header>
+        <nav class="navbar navbar1 navbar-expand-sm">
+    
+            <div class="container">
+    
+                <!-- Left -->
+                <ul class="navbar-nav flex-grow-1">
+    
+                    <li class="nav-item">
+                        <a class="nav-link text-light">THE WHITE HORSE INN</a>
+                    </li>
+    
+                </ul>      
+    
+                <!-- Right -->
+                <ul class="navbar-nav nav-space flex-grow-1">
+                    
+                <li class="nav-item nav-button">
+                    <a class="nav-link text-light" href="/IMS/Serverside/Logout.php">LOGOUT</a>
+                </li>';
+
+                if ($page == "home") {
+                    echo 
+                    '<li class="nav-item nav-button-selected">
+                        <a class="nav-link text-light" href="/IMS/Clientside/Manager/Index.php">HOME</a>
+                    </li>';
+                } else {
+                    echo 
+                    '<li class="nav-item nav-button">
+                        <a class="nav-link text-light" href="/IMS/Clientside/Manager/Index.php">HOME</a>
+                    </li>';
+                }
+
+                if ($page == "supplier") {
+                    echo 
+                    '<li class="nav-item nav-button-selected">
+                        <a class="nav-link text-light" href="/IMS/Clientside/Manager/Suppliers.php">SUPPLIERS</a>
+                    </li>';
+                } else {
+                    echo 
+                    '<li class="nav-item nav-button">
+                        <a class="nav-link text-light" href="/IMS/Clientside/Manager/Suppliers.php">SUPPLIERS</a>
+                    </li>';
+                }
+
+                if ($page == "order") {
+                    echo 
+                    '<li class="nav-item nav-button-selected">
+                        <a class="nav-link text-light" href="/IMS/Clientside/Manager/Orders.php">ORDERS</a>
+                    </li>';
+                } else {
+                    echo 
+                    '<li class="nav-item nav-button">
+                        <a class="nav-link text-light" href="/IMS/Clientside/Manager/Orders.php">ORDERS</a>
+                    </li>';
+                }
+    
+                echo 
+               '</ul>
+    
+            </div>
+        </nav>
+    
+        <br><br>
+    </header>';
 }
 
 //-------------------------------------------------------------------------------------------------------

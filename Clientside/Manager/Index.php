@@ -1,6 +1,6 @@
 <?php 
 
-error_reporting(0);
+//error_reporting(0);
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
@@ -56,6 +56,9 @@ $SelectedItem = getSelectedStock($selected);     //getting all info for selected
 if (isset($_POST['edit'])) {updateSelected();}   //update selected
 if (isset($_POST['delete'])) {deleteSelected();} //delete selected
 
+$AlertQ = FALSE;                                 //Set alert boolean - Quantity inserted larger than in stock
+$AlertT = FALSE;                                 //Set alert boolean - item now below threshold
+
 if (isset($_POST['insert'])) {                   
 
     $alert = insertStock($SelectedItem);         //insert used quantity into selected item
@@ -63,60 +66,9 @@ if (isset($_POST['insert'])) {
     $AlertT = $alert[1];                         //Item below threshold alert                                
 }
 
-//----- ALERTS / FILTER -----
-
-$AlertQ = FALSE;                                 //Set alert boolean 
-$AlertT = FALSE;                                 //Set alert boolean
-
 $sortBy = "";
-
-if (isset($_POST['Cat']))       {$sortBy = "Category";}
-if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}
-
-function insertStock($SelectedItem) {
-
-    //Subtracting insert quantity
-    $CurrentQ = $SelectedItem[0][4];
-    $InsertQ = $_POST['InsertQuantity'];
-    $NewQ = $CurrentQ-$InsertQ;
-
-    //Selected item data
-    $N = $SelectedItem[0][0];
-    $Threshold = $SelectedItem[0][3];
-    $Cat = $SelectedItem[0][1];
-
-    //Number inserted larger than current stock 
-    if ($NewQ < 0) {
-
-        $AlertQ = TRUE; 
-
-    } else {
-
-        //Updating quantity
-        $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-        $sql = 'UPDATE Stock SET Quantity=:NewQ WHERE Item_Name=:Name';
-        $stmt = $db->prepare($sql); 
-        $stmt->bindParam(':Name', $N, SQLITE3_TEXT);
-        $stmt->bindParam(':NewQ', $NewQ, SQLITE3_INTEGER);
-        $stmt->execute();  
-
-        //Add item to Item_Order table if below threshold
-        if ($NewQ < $Threshold) {
-
-            $AlertT = TRUE;
-
-            $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-            $sql = 'INSERT INTO Item_Order (Item_Name, Category) 
-                    VALUES (:ItemName, :Category)';
-            $stmt = $db->prepare($sql); 
-            $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
-            $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
-            $stmt->execute();  
-        }
-    }
-
-    return array($AlertQ, $AlertT);
-}
+if (isset($_POST['Cat']))       {$sortBy = "Category";}   //Filters for table
+if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}  //^
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -124,7 +76,7 @@ function insertStock($SelectedItem) {
 ?>
 
 <body>
-    <?php require("ManagerNavbar.php");?>
+    <?php nav("home");?>
     <div class="container">
 
     <!-- Current Stock and Table ------------------------------------------------------------------------------------>
