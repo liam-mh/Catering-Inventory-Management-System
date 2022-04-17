@@ -1,6 +1,6 @@
 <?php 
 
-//error_reporting(0);
+error_reporting(0);
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
@@ -112,7 +112,7 @@ function insertStock($SelectedItem) {
     return array($AlertQ, $AlertT);
 }
 
-
+/*
 echo " // Quantity = "; 
 echo $AlertQ ? 'true' : 'false';
 echo " // Threshold = "; 
@@ -121,6 +121,7 @@ echo " // functionAlertQ = ";
 echo $alert[0]? 'true' : 'false';
 echo " // functionAlertT = "; 
 echo $alert[1]? 'true' : 'false';
+*/
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -184,12 +185,19 @@ echo $alert[1]? 'true' : 'false';
                     </thead>
                     <tbody>
                         <?php 
-                        $stock = getCurrentStock();
-                        for ($i=0; $i<count($stock); $i++):     
+                        //get stock loop for table
+                        $stock = getCurrentStock();          
+                        for ($i=0; $i<count($stock); $i++): 
+
+                        //if below threshold set colour to highlight
+                        $below = "";   
+                        if ($stock[$i]['Quantity'] < $stock[$i]['Threshold']) {
+                            $below = "style=color:#E8175D";  
+                        }    
                         ?>
                             <tr> 
-                                <td><?php echo $stock[$i]['Item_Name']?></td>
-                                <td><?php echo $stock[$i]['Quantity']?></td>  
+                                <td <?php echo $below ?> ><?php echo $stock[$i]['Item_Name']?></td>
+                                <td <?php echo $below ?> ><?php echo $stock[$i]['Quantity']?></td>  
                                 <td><?php echo $stock[$i]['Threshold']?>
                                 <td><?php echo $stock[$i]['Category']?></td>
                                 <td>£<?php echo number_format((($stock[$i]['Unit_Price'])/100),2)?></td>
@@ -202,9 +210,14 @@ echo $alert[1]? 'true' : 'false';
 
             <?php if($_GET['Selected']==""): ?>
                 <div class="col-md-4">
+                    <b>The White Horse Inn</b><br>
+                    <b>Inventory Management System</b><br>
+                    <hr>
                     <p>Please select an item of stock to Insert Used stock or edit / delete an item.</p>
                     <br>
                     <p>Or press the 'ADD NEW' tab to insert a new stock item into your current inventory.</p>
+                    <hr>
+                    <p>Items displayed on the left that are highlighted with their 'in stock' number are below the assigned threshold.</p>
                 </div>
             <?php endif ?>
 
@@ -296,8 +309,7 @@ echo $alert[1]? 'true' : 'false';
                             </div>
                             
                             <div class="col" style="text-align:center"> 
-                                <form method="post">    
-                                    <input type="hidden" name="selected" value ="<?php echo $_GET['Selected'] ?>">                       
+                                <form method="post">                          
                                     <input type="submit" value="DELETE" class="btn btn-danger" name="delete">
                                 </form>
                             </div>

@@ -61,7 +61,7 @@ function deleteSelected() {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'DELETE FROM Stock WHERE Item_Name=:Name';
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':Name', $selected, SQLITE3_TEXT);
+    $stmt->bindParam(':Name', $_GET['Selected'], SQLITE3_TEXT);
     $stmt->execute();
 
     header("Location:Index.php?deleted=true");
