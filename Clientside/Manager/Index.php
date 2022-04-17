@@ -34,11 +34,12 @@ $allFields = "yes";
 if (isset($_POST['add'])) {
 
     //Checking all fields are inputted
-    if ($_POST['ItemName']=="")   {$ItemNameError = "Please enter the item name"; $allFields = "no";}
-    if ($_POST['Category']=="")   {$CategoryError = "Please select a category";   $allFields = "no";}
-    if ($_POST['UnitPounds']=="") {$UnitPoundsError = "Please enter pounds";      $allFields = "no";}
-    if ($_POST['UnitPence']=="")  {$UnitPenceError = "Please enter pence";        $allFields = "no";}
-    if ($_POST['Threshold']=="")  {$ThresholdError = "Please enter a threshold";  $allFields = "no";}
+    if ($_POST['ItemName']=="")   {$ItemNameError   = "EMPTY!"; $allFields = "no";}
+    if ($_POST['Category']=="")   {$CategoryError   = "EMPTY!"; $allFields = "no";}
+    if ($_POST['UnitPounds']=="") {$UnitPoundsError = "EMPTY!"; $allFields = "no";}
+    if ($_POST['UnitPence']=="")  {$UnitPenceError  = "EMPTY!"; $allFields = "no";}
+    if ($_POST['Threshold']=="")  {$ThresholdError  = "EMPTY!"; $allFields = "no";}
+
     if ($allFields == "yes") {
         addNew();
         $AlertA = TRUE;
@@ -347,6 +348,12 @@ echo $alert[1]? 'true' : 'false';
                     New item successfully added to stock table.
                 </div>
             <?php endif; ?>
+            <!-- ALERT: Invalid inputs -->
+            <?php if ($allFields == "no"): ?>
+                <div class="alert alert-danger" role="alert" style="font-weight: bold;">
+                    All fields need to be filled out to insert new stock.
+                </div>
+            <?php endif; ?>
         </div>
 
         <div class="col-md-3" style="text-align:center">  
@@ -386,7 +393,7 @@ echo $alert[1]? 'true' : 'false';
                     <div class="row">
                     
                         <div class="col">
-                            <div class="form-group a">
+                            <div class="form-group">
                                 <input type="text" name="UnitPounds" placeholder="Pounds">
                                 <span class="text-danger"><?php echo $UnitPoundsError; ?></span>
                             </div>
@@ -417,10 +424,6 @@ echo $alert[1]? 'true' : 'false';
             </div> 
         </form>
     </div>
-
-    <?php if($allFields == "no"): ?>
-        <span class="text-danger">All fields need to filled out to insert new stock, please fill out: <?php echo $ItemNameError.$CategoryError.$UnitPoundsError.$UnitPenceError.$ThresholdError; ?></span>
-    <?php endif ?>
 
     <?php endif; ?> 
 

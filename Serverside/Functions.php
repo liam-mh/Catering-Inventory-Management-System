@@ -52,6 +52,15 @@ function updateSelected() {
     $stmt->bindParam(':Quantity',  $_POST['UpdateQuantity'], SQLITE3_INTEGER);
     $stmt->execute();
 
+    ////Removing items from Item_Order table if back above threshold
+    if ($_POST['UpdateQuantity'] > $_POST['UpdateThreshold']) {
+
+        $sql = 'DELETE FROM Item_Order WHERE Item_Name=:Name';
+        $stmt = $db->prepare($sql); 
+        $stmt->bindParam(':Name', $_POST['SelectedUpdateItemName'], SQLITE3_TEXT);
+        $stmt->execute();  
+    }
+
     header('Refresh:0');
 }
 
