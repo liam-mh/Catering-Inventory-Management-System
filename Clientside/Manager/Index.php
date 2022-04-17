@@ -56,15 +56,22 @@ $SelectedItem = getSelectedStock($selected);     //getting all info for selected
 if (isset($_POST['edit'])) {updateSelected();}   //update selected
 if (isset($_POST['delete'])) {deleteSelected();} //delete selected
 
-$AlertQ = FALSE;                                 //Set alert boolean 
-$AlertT = FALSE;                                 //Set alert boolean
-
 if (isset($_POST['insert'])) {                   
 
     $alert = insertStock($SelectedItem);         //insert used quantity into selected item
     $AlertQ = $alert[0];                         //Item quantity too large alert                      
     $AlertT = $alert[1];                         //Item below threshold alert                                
 }
+
+//----- ALERTS / FILTER -----
+
+$AlertQ = FALSE;                                 //Set alert boolean 
+$AlertT = FALSE;                                 //Set alert boolean
+
+$sortBy = "";
+
+if (isset($_POST['Cat']))       {$sortBy = "Category";}
+if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}
 
 function insertStock($SelectedItem) {
 
@@ -156,13 +163,36 @@ function insertStock($SelectedItem) {
         </div>
     </div>  
     
-
+    <!-- CURRENT STOCK  -->
     <div style="text-align:center">  
         <div class="w1-box row">
 
             <div class="col-md-8">
-                <!-- CURRENT STOCK  -->
-                <table class="styled-table" style="display:block; height:570px; overflow:auto;">
+
+                <div class="row" style="text-align:left">
+
+                    <div class="col-md-3">
+                        <p>SORT TABLE ITEMS :</p>
+                    </div>
+                    <div class="col-md-2">
+                        <form method="post">
+                            <input type="submit" value="NAME" style="font-size:10" class="btn-select" name="Name">
+                        </form> 
+                    </div>
+                    <div class="col-md-2">
+                        <form method="post">
+                            <input type="submit" value="CATEGORY" style="font-size:10" class="btn-select" name="Cat">
+                        </form> 
+                    </div>
+                    <div class="col-md-3">
+                        <form method="post">
+                            <input type="submit" value="BELOW THRESHOLD" style="font-size:10" class="btn-select" name="Threshold">
+                        </form> 
+                    </div>
+                    
+                </div>
+
+                <table class="styled-table" style="display:block; height:530px; overflow:auto;">
                     <thead>
                         <th>Item Name</th>
                         <th>In Stock</th>
@@ -174,7 +204,9 @@ function insertStock($SelectedItem) {
                     <tbody>
                         <?php 
                         //get stock loop for table
-                        $stock = getCurrentStock();          
+                        $stock = getCurrentStock();  
+                        if ($sortBy == "Category")  {$stock = getCurrentStockByCat();}        
+                        if ($sortBy == "Threshold") {$stock = getCurrentStockBelow();}        
                         for ($i=0; $i<count($stock); $i++): 
 
                         //if below threshold set colour to highlight
