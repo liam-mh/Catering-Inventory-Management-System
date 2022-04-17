@@ -60,8 +60,9 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
                     <table class="styled-table" style="display:block; height:100px; overflow:auto;">
                         <thead>
                             <th>Date</th>
-                            <th>Accept/Decline</th>
-                            <th>Total</th>    
+                            <th>A / D</th>
+                            <th>Total</th> 
+                            <th>PDF</th>   
                         </thead>
                         <tbody>
                             <?php 
@@ -72,7 +73,7 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
                                 <td><?php echo $PDF[$i][0]?></td>                                                           
                                 <td><?php echo $PDF[$i][4]?></td>
                                 <td>£<?php echo number_format((($PDF[$i][3])/100),2)?></td>
-                                <!-- <td><a href="<?php //echo $PDF[$i]['PDF_Link']?>" target="_blank" rel="noopener noreferrer">click</a></td> -->                                                            
+                                <td><a href="../../Serverside/PDF_Store/Invoice_<?php echo $PDF[$i][5]?>.pdf" target="_blank">click</a></td>                                                           
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -105,8 +106,9 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
                     <table class="styled-table" style="display:block; height:100px; overflow:auto;">
                         <thead>
                             <th>Date</th>
-                            <th>Accept/Decline</th>
-                            <th>Total</th>    
+                            <th>A / D</th>
+                            <th>Total</th>   
+                            <th>PDF</th> 
                         </thead>
                         <tbody>
                             <?php 
@@ -117,6 +119,7 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
                                 <td><?php echo $PDF[$i][0]?></td>                                                           
                                 <td><?php echo $PDF[$i][4]?></td>
                                 <td>£<?php echo number_format((($PDF[$i][3])/100),2)?></td>
+                                <td><a href="../../Serverside/PDF_Store/Invoice_<?php echo $PDF[$i][5]?>.pdf" target="_blank">click</a></td>                                                           
                             </tr>
                             <?php endfor; ?>
                         </tbody>
@@ -149,8 +152,9 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
                     <table class="styled-table" style="display:block; height:100px; overflow:auto;">
                         <thead>
                             <th>Date</th>
-                            <th>Accept/Decline</th>
+                            <th>A / D</th>
                             <th>Total</th>    
+                            <th>PDF</th>
                         </thead>
                         <tbody>
                             <?php 
@@ -161,6 +165,7 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
                                 <td><?php echo $PDF[$i][0]?></td>                                                           
                                 <td><?php echo $PDF[$i][4]?></td>
                                 <td>£<?php echo number_format((($PDF[$i][3])/100),2)?></td>
+                                <td><a href="../../Serverside/PDF_Store/Invoice_<?php echo $PDF[$i][5]?>.pdf" target="_blank">click</a></td>                                                           
                             </tr>
                             <?php endfor; ?>
                         </tbody>

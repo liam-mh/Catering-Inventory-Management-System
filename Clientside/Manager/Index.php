@@ -106,23 +106,10 @@ function insertStock($SelectedItem) {
             $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
             $stmt->execute();  
         }
-
-        header("Refresh:0");
     }
 
     return array($AlertQ, $AlertT);
 }
-
-/*
-echo " // Quantity = "; 
-echo $AlertQ ? 'true' : 'false';
-echo " // Threshold = "; 
-echo $AlertT ? 'true' : 'false';
-echo " // functionAlertQ = "; 
-echo $alert[0]? 'true' : 'false';
-echo " // functionAlertT = "; 
-echo $alert[1]? 'true' : 'false';
-*/
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
