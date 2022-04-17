@@ -1,10 +1,9 @@
 <?php
 
-//-------------------------------------------------------------------------------------------------------
-//----- This page contains most functions used throughout the system ------------------------------------
-//----- Functions are split by generalised catagory, not by specific pages ------------------------------
-//-------------------------------------------------------------------------------------------------------
-
+/**
+ * This page contains most functions used throughout the system 
+ * Functions are split by generalised catagory, not by specific pages 
+*/
 
 //-------------------------------------------------------------------------------------------------------
 //----- ADD NEW / EDIT STOCK ----------------------------------------------------------------------------
@@ -16,10 +15,12 @@ function addNew() {
     $pounds = $_POST['UnitPounds'];
     $pence = $_POST['UnitPence'];
     $UnitPrice = ($pounds*100) + $pence;
+    //changing null fields to 0
+    $pounds = ($SelectedItem[0][2] < 100) ? '0' : substr($selectedPrice, 0, -2);
 
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'INSERT INTO Stock (Item_Name, Category, Unit_Price, Threshold) 
-            VALUES (:ItemName, :Category, :UnitPrice, :Threshold)';
+    $sql = 'INSERT INTO Stock (Item_Name, Category, Unit_Price, Threshold, Quantity) 
+            VALUES (:ItemName, :Category, :UnitPrice, :Threshold, 0)';
     $stmt = $db->prepare($sql); 
     $stmt->bindParam(':ItemName',  $_POST['ItemName'], SQLITE3_TEXT);
     $stmt->bindParam(':Category',  $_POST['Category'], SQLITE3_TEXT);

@@ -1,5 +1,7 @@
 <?php 
 
+//error_reporting(0);
+
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
@@ -15,9 +17,14 @@ if (!isset($_SESSION['Username'])) {
 //-------------------------------------------------------------------------------------------------------
 //----- ADD NEW TAB -------------------------------------------------------------------------------------
 
-//Add new tab being selected
-$AddNew = FALSE;
-if (isset($_POST['AddNew'])) {$AddNew = TRUE;}
+$AddNew = FALSE;                                //Boolean if add new tab is selected
+if (isset($_POST['AddNew'])) {$AddNew = TRUE;}  //^
+if (isset($_POST['CurrentStock'])) {            //^
+    $AddNew = FALSE;
+    $allFields = "";
+}
+
+$AlertA = FALSE;                                //Set alert boolean - Stock added 
 
 //Setting error variables
 $ItemNameError = $CategoryError = $UnitPoundsError = $UnitPenceError = $ThresholdError = ""; 
@@ -34,7 +41,9 @@ if (isset($_POST['add'])) {
     if ($_POST['Threshold']=="")  {$ThresholdError = "Please enter a threshold";  $allFields = "no";}
     if ($allFields == "yes") {
         addNew();
+        $AlertA = TRUE;
     }
+    $AddNew = TRUE;
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -49,10 +58,11 @@ if (isset($_POST['delete'])) {deleteSelected();} //delete selected
 $AlertQ = FALSE;                                 //Set alert boolean 
 $AlertT = FALSE;                                 //Set alert boolean
 
-//insert quantity into selected
-if (isset($_POST['insert'])) {
+if (isset($_POST['insert'])) {                   
 
-    insertStock($SelectedItem);
+    $alert = insertStock($SelectedItem);         //insert used quantity into selected item
+    $AlertQ = $alert[0];                         //Item quantity too large alert                      
+    $AlertT = $alert[1];                         //Item below threshold alert                                
 }
 
 function insertStock($SelectedItem) {
@@ -67,11 +77,10 @@ function insertStock($SelectedItem) {
     $Threshold = $SelectedItem[0][3];
     $Cat = $SelectedItem[0][1];
 
+    //Number inserted larger than current stock 
     if ($NewQ < 0) {
 
-        //insert number larger than current stock alert
         $AlertQ = TRUE; 
-        return $AlertQ;
 
     } else {
 
@@ -95,13 +104,23 @@ function insertStock($SelectedItem) {
             $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
             $stmt->bindParam(':Category', $Cat, SQLITE3_TEXT);
             $stmt->execute();  
-
-            return $AlertT;
         }
 
         header("Refresh:0");
     }
+
+    return array($AlertQ, $AlertT);
 }
+
+
+echo " // Quantity = "; 
+echo $AlertQ ? 'true' : 'false';
+echo " // Threshold = "; 
+echo $AlertT ? 'true' : 'false';
+echo " // functionAlertQ = "; 
+echo $alert[0]? 'true' : 'false';
+echo " // functionAlertT = "; 
+echo $alert[1]? 'true' : 'false';
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -128,20 +147,14 @@ function insertStock($SelectedItem) {
         <div class="col-md-6">
             <!-- ALERT: insert larger than quantity -->
             <?php if ($AlertQ == TRUE): ?>
-                <div class="alert alert-danger alert-dismissible showcol-10" role="alert" style="font-weight: bold;">
+                <div class="alert alert-danger" role="alert" style="font-weight: bold;">
                     Insert used quantity larger than current stock level
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
             <?php endif; ?>
             <!-- ALERT: Item below threshold -->
             <?php if ($AlertT == TRUE): ?>
-                <div class="alert alert-danger alert-dismissible showcol-10" role="alert" style="font-weight: bold;">
+                <div class="alert alert-danger" role="alert" style="font-weight: bold;">
                     <?php echo $selected; ?> is below set threshold, and has been added to orders page.
-                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
                 </div>
             <?php endif; ?>
         </div>
@@ -187,6 +200,14 @@ function insertStock($SelectedItem) {
                 </table>
             </div>
 
+            <?php if($_GET['Selected']==""): ?>
+                <div class="col-md-4">
+                    <p>Please select an item of stock to Insert Used stock or edit / delete an item.</p>
+                    <br>
+                    <p>Or press the 'ADD NEW' tab to insert a new stock item into your current inventory.</p>
+                </div>
+            <?php endif ?>
+
             <!-- SELECTED STOCK -->
 
             <?php if($_GET['Selected']!=""): ?>
@@ -199,24 +220,25 @@ function insertStock($SelectedItem) {
 
                 <br>
 
-                <div class="black-box">
+                <?php if ($SelectedItem[0][4] != 0): ?>
+                    <div class="black-box">
 
-                    <p>INSERT USED STOCK</p>
+                        <p>INSERT USED STOCK</p>
 
-                    <form method="post">
+                        <form method="post">
 
-                        <div class="form-group row">
-                            <input class="col" type="text" name="InsertQuantity" placeholder="Quantity">
-                            <div class="col" style="text-align:center">                             
-                                <input type="hidden" name="SelectedUpdateItemName" value="<?php echo $_GET['Selected'] ?>">   
-                                <input type="submit" value="INSERT" class="btn btn-main" name="insert">
+                            <div class="form-group row">
+                                <input class="col" type="text" name="InsertQuantity" placeholder="Quantity">
+                                <div class="col" style="text-align:center">                             
+                                    <input type="hidden" name="SelectedUpdateItemName" value="<?php echo $_GET['Selected'] ?>">   
+                                    <input type="submit" value="INSERT" class="btn btn-main" name="insert">
+                                </div>
                             </div>
-                        </div>
-    
-                    </form>
-                </div>   
-
-                <br>
+        
+                        </form>
+                    </div>   
+                    <br>
+                <?php endif ?>
 
                 <!-- UPDATE SELECTED STOCK -->
                 <div class="black-box">
@@ -248,10 +270,15 @@ function insertStock($SelectedItem) {
                         </div>
                         <div class="form-group row">
                             <label class="control-label labelFont col-md-6">PRICE £</label>
-                            <?php //variables for price display
+                            <?php 
+                                //variables for price display
                                 $selectedPrice = $SelectedItem[0][2];
-                                $selectedPence = substr($selectedPrice, -2);
                                 $selectedPound = substr($selectedPrice, 0, -2);
+                                $selectedPence = substr($selectedPrice, -2);
+                    
+                                //changing null fields to 0
+                                $selectedPound = ($SelectedItem[0][2] < 100) ? '0' : substr($selectedPrice, 0, -2);
+                                $selectedPence = (substr($selectedPrice, 0, -2) == 0) ? '0' : substr($selectedPrice, -2);
                             ?>
                             <input class="col" type="text" name="UpdateUnitPounds" value="<?php echo $selectedPound; ?>">
                             <div class="col-md-1">.</div>
@@ -301,7 +328,14 @@ function insertStock($SelectedItem) {
             </form>  
         </div>
 
-        <div class="col-md-6"></div>
+        <div class="col-md-6">
+            <!-- ALERT: New stock item added -->
+            <?php if ($AlertA == TRUE): ?>
+                <div class="alert alert-success" role="alert" style="font-weight: bold;">
+                    New item successfully added to stock table.
+                </div>
+            <?php endif; ?>
+        </div>
 
         <div class="col-md-3" style="text-align:center">  
             <div class="w1-tab">
@@ -341,7 +375,7 @@ function insertStock($SelectedItem) {
                     
                         <div class="col">
                             <div class="form-group a">
-                                <input class="a" type="text" name="UnitPounds" placeholder="Pounds">
+                                <input type="text" name="UnitPounds" placeholder="Pounds">
                                 <span class="text-danger"><?php echo $UnitPoundsError; ?></span>
                             </div>
                         </div>
@@ -371,6 +405,10 @@ function insertStock($SelectedItem) {
             </div> 
         </form>
     </div>
+
+    <?php if($allFields == "no"): ?>
+        <span class="text-danger">All fields need to filled out to insert new stock, please fill out: <?php echo $ItemNameError.$CategoryError.$UnitPoundsError.$UnitPenceError.$ThresholdError; ?></span>
+    <?php endif ?>
 
     <?php endif; ?> 
 
