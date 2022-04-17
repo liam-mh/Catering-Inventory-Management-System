@@ -79,10 +79,28 @@ function deleteSelected() {
 //-------------------------------------------------------------------------------------------------------
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
 
-//All stock
+//All stock by name
 function getCurrentStock () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Stock ORDER BY Item_Name ASC');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+//All stock by category
+function getCurrentStockByCat () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Stock ORDER BY Category ASC');
+    while ($row=$rows->fetchArray()) {
+        $rows_array[]=$row;
+    }
+    return $rows_array;
+}
+//All stock thats below below threshold
+function getCurrentStockBelow () {
+    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
+    $rows = $db->query('SELECT * FROM Stock WHERE Quantity < Threshold ORDER BY Item_Name ASC');
     while ($row=$rows->fetchArray()) {
         $rows_array[]=$row;
     }
