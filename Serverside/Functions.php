@@ -82,7 +82,7 @@ function deleteSelected() {
 //All stock
 function getCurrentStock () {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $rows = $db->query('SELECT * FROM Stock');
+    $rows = $db->query('SELECT * FROM Stock ORDER BY Item_Name ASC');
     while ($row=$rows->fetchArray()) {
         $rows_array[]=$row;
     }
