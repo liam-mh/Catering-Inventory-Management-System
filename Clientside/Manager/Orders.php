@@ -1,6 +1,7 @@
 <?php 
 
-error_reporting(0);
+//error_reporting(0);
+$ErrorMessage = "";
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
@@ -28,21 +29,12 @@ $UnitPrice = $SelectedItem[0][2];            //Selected item price per unit
 //-------------------------------------------------------------------------------------------------------
 //----- ADD ITEM TO ORDER -------------------------------------------------------------------------------
 
-//add item to Item_Order
-if (isset($_POST['Add'])) {
-
-    //Calculating total price of order
-    $total = $UnitPrice * $_POST['OrderQuantity'];
-
-    $db = new SQLite3('/Applications/MAMP/db/IMS.db');
-    $sql = 'UPDATE Item_Order 
-            SET Order_Quantity=:Quantity, Total=:Total 
-            WHERE Item_Name=:ItemName';
-    $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
-    $stmt->bindParam(':Quantity', $_POST['OrderQuantity'], SQLITE3_INTEGER);
-    $stmt->bindParam(':Total',    $total, SQLITE3_INTEGER);
-    $stmt->execute();
+if (isset($_POST['Add'])) {                  //add item to Item_Order
+    try {
+        addToOrder($UnitPrice);
+    } catch(exception $e) {
+        $ErrorMessage = $e->getMessage();
+    }
 }
 
 //-------------------------------------------------------------------------------------------------------
@@ -83,6 +75,13 @@ echo $AlertM;
 <body>
     <?php nav("order");?>
     <div class="container">
+
+    <!-- ALERT: ERROR MESSAGE -->
+    <?php if ($ErrorMessage != ""): ?>
+        <div class="alert alert-danger" role="alert" style="font-weight:bold; width:fit-content">
+            ERROR MESSAGE: <?php echo $ErrorMessage ?>
+        </div>
+    <?php endif; ?>
 
     <div style="text-align:center">  
         <div class="w1-box">
