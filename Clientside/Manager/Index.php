@@ -18,8 +18,8 @@ if (!isset($_SESSION['Username'])) {
 //----- ADD NEW TAB -------------------------------------------------------------------------------------
 
 $AddNew = FALSE;                                //Boolean if add new tab is selected
-if (isset($_POST['AddNew'])) {$AddNew = TRUE;}  //^
-if (isset($_POST['CurrentStock'])) {            //^
+if (isset($_POST['AddNew'])) {$AddNew = TRUE;}  //Add New tab
+if (isset($_POST['CurrentStock'])) {            //Current stock tab
     $AddNew = FALSE;
     $allFields = "";
 }
@@ -66,10 +66,15 @@ if (isset($_POST['insert'])) {
     $AlertT = $alert[1];                         //Item below threshold alert                                
 }
 
-$sortBy = "";
-if (isset($_POST['Name']))      {$sortBy = "Name";}  //^
-if (isset($_POST['Cat']))       {$sortBy = "Category";}   //Filters for table
+//----- FILTERS FOR STOCK -------------------------------------------------------------------------------
+
+$sortBy = $_SESSION['sortBy'];                            //Retrieving last filter selected before url change
+
+if (isset($_POST['Name']))      {$sortBy = "Name";}       //Filters for table
+if (isset($_POST['Cat']))       {$sortBy = "Category";}   //^
 if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}  //^
+
+$_SESSION['sortBy'] = $sortBy;                            //Passing last selected filter when selecting an item
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
