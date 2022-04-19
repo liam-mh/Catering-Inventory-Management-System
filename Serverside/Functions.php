@@ -11,6 +11,11 @@
 //Adds new item to Stock table
 function addNew() {
 
+    //Error Handling - check if input is only a number
+    if (is_numeric($_POST['UnitPounds'])) {} else {throw new Exception("Pounds must be a number.");}
+    if (is_numeric($_POST['UnitPence']))  {} else {throw new Exception("Pence must be a number.");}
+    if (is_numeric($_POST['Threshold']))  {} else {throw new Exception("Threshold must be a number.");}
+
     //Unit price calculation
     $pounds = $_POST['UnitPounds'];
     $pence = $_POST['UnitPence'];
@@ -31,6 +36,12 @@ function addNew() {
 
 //Updates details of selected item in Stock table
 function updateSelected() {
+
+    //Error Handling - check if input is only a number
+    if (is_numeric($_POST['UpdateUnitPounds'])) {} else {throw new Exception("Update pounds value must be a number.");}
+    if (is_numeric($_POST['UpdateUnitPence']))  {} else {throw new Exception("Update pence value must be a number.");}
+    if (is_numeric($_POST['UpdateThreshold']))  {} else {throw new Exception("Update threshold value must be a number.");}
+    if (is_numeric($_POST['UpdateQuantity']))   {} else {throw new Exception("Update quantity value must be a number.");}
 
     //Unit price calculation
     $pounds = $_POST['UpdateUnitPounds'];
@@ -78,6 +89,12 @@ function deleteSelected() {
 
 //Inserts used stock input into stock table
 function insertStock($SelectedItem) {
+
+    //Error Handling - check if input is only a number
+    if (is_numeric($_POST['UpdateUnitPounds'])) {
+    } else {
+        throw new Exception("Insert quantity value must be a number");
+    }
 
     //Subtracting insert quantity
     $CurrentQ = $SelectedItem[0][4];

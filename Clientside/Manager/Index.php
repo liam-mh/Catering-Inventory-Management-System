@@ -1,6 +1,7 @@
 <?php 
 
 //error_reporting(0);
+$ErrorMessage = "";
 
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
@@ -40,30 +41,45 @@ if (isset($_POST['add'])) {
     if ($_POST['UnitPence']=="")  {$UnitPenceError  = "EMPTY!"; $allFields = "no";}
     if ($_POST['Threshold']=="")  {$ThresholdError  = "EMPTY!"; $allFields = "no";}
 
+    //if all fields filled in try adding to Stock table
     if ($allFields == "yes") {
-        addNew();
-        $AlertA = TRUE;
+        try {
+            addNew();
+        } catch(exception $e) {
+            $ErrorMessage = $e->getMessage();
+        }
+        ($ErrorMessage != $e->getMessage()) ? $AlertA=TRUE : $AlertA=FALSE ;
     }
-    $AddNew = TRUE;
+    $AddNew = TRUE; //Staying on add new tab
 }
 
 //-------------------------------------------------------------------------------------------------------
 //----- CURRENT STOCK / EDIT & DELETE -------------------------------------------------------------------
 
-$selected = $_GET['Selected'];                   //Selected item
-$SelectedItem = getSelectedStock($selected);     //getting all info for selected item
+$selected = $_GET['Selected'];                              //Selected item
+$SelectedItem = getSelectedStock($selected);                //getting all info for selected item
 
-if (isset($_POST['edit'])) {updateSelected();}   //update selected
-if (isset($_POST['delete'])) {deleteSelected();} //delete selected
+try {
+    if (isset($_POST['edit'])) {updateSelected();}          //update selected
+} catch(Exception $e) {
+    $ErrorMessage = $e->getMessage();
+}
 
-$AlertQ = FALSE;                                 //Set alert boolean - Quantity inserted larger than in stock
-$AlertT = FALSE;                                 //Set alert boolean - item now below threshold
+if (isset($_POST['delete'])) {deleteSelected();}            //delete selected
 
-if (isset($_POST['insert'])) {                   
+//----- INSERT USED STOCK -------------------------------------------------------------------------------
 
-    $alert = insertStock($SelectedItem);         //insert used quantity into selected item
-    $AlertQ = $alert[0];                         //Item quantity too large alert                      
-    $AlertT = $alert[1];                         //Item below threshold alert                                
+$AlertQ = FALSE;                                            //Set alert boolean - Quantity inserted larger than in stock
+$AlertT = FALSE;                                            //Set alert boolean - item now below threshold
+
+try {
+    if (isset($_POST['insert'])) {                   
+        $alert = insertStock($SelectedItem);                //insert used quantity into selected item
+        $AlertQ = $alert[0];                                //Item quantity too large alert                      
+        $AlertT = $alert[1];                                //Item below threshold alert                                
+    }
+} catch(exception $e) {
+    $ErrorMessage = $e->getMessage();
 }
 
 //----- FILTERS FOR STOCK -------------------------------------------------------------------------------
@@ -110,6 +126,13 @@ $_SESSION['sortBy'] = $sortBy;                            //Passing last selecte
             <?php if ($AlertT == TRUE): ?>
                 <div class="alert alert-danger" role="alert" style="font-weight: bold;">
                     <?php echo $selected; ?> is below set threshold, and has been added to orders page.
+                </div>
+            <?php endif; ?>
+
+            <!-- ALERT: ERROR MESSAGE -->
+            <?php if ($ErrorMessage != ""): ?>
+                <div class="alert alert-danger" role="alert" style="font-weight: bold;">
+                    ERROR MESSAGE: <?php echo $ErrorMessage ?>
                 </div>
             <?php endif; ?>
         </div>
@@ -332,6 +355,13 @@ $_SESSION['sortBy'] = $sortBy;                            //Passing last selecte
             <?php if ($allFields == "no"): ?>
                 <div class="alert alert-danger" role="alert" style="font-weight: bold;">
                     All fields need to be filled out to insert new stock.
+                </div>
+            <?php endif; ?>
+
+            <!-- ALERT: ERROR MESSAGE -->
+            <?php if ($ErrorMessage != ""): ?>
+                <div class="alert alert-danger" role="alert" style="font-weight: bold;">
+                    ERROR MESSAGE: <?php echo $ErrorMessage ?>
                 </div>
             <?php endif; ?>
         </div>
