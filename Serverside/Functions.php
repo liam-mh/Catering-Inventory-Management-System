@@ -295,7 +295,7 @@ function placeOrder ($c,$t) {
     $stmt->bindParam(':Cat', $c, SQLITE3_TEXT);
     $stmt->execute();
 
-    //Adding details to Order table
+    //Adding details to Whole_Order table
     //current date 
     $date  = new DateTime(); 
     $d = $date->format('d-m-y');

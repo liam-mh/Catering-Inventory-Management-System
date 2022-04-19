@@ -67,6 +67,7 @@ if (isset($_POST['insert'])) {
 }
 
 $sortBy = "";
+if (isset($_POST['Name']))      {$sortBy = "Name";}  //^
 if (isset($_POST['Cat']))       {$sortBy = "Category";}   //Filters for table
 if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}  //^
 
@@ -79,7 +80,8 @@ if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}  //^
     <?php nav("home");?>
     <div class="container">
 
-    <!-- Current Stock and Table ------------------------------------------------------------------------------------>
+    <!-- Current Stock and Table
+    ---------------------------------------------------------------------------------------------->
     
     <?php if($AddNew == FALSE): ?>  
     
@@ -300,7 +302,9 @@ if (isset($_POST['Threshold'])) {$sortBy = "Threshold";}  //^
 
     <?php endif; ?>      
 
-    <!-- ADD NEW ------------------------------------------------------------------------------------>
+
+    <!-- Add New
+    ---------------------------------------------------------------------------------------------->
             
     <?php if($AddNew == TRUE): ?>
 
