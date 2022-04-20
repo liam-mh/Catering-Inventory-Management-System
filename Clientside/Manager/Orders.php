@@ -31,7 +31,7 @@ $UnitPrice = $SelectedItem[0][2];            //Selected item price per unit
 
 if (isset($_POST['Add'])) {                  //add item to Item_Order
     try {
-        addToOrder($UnitPrice);
+        addToOrder($UnitPrice, $N);
     } catch(exception $e) {
         $ErrorMessage = $e->getMessage();
     }
@@ -67,8 +67,6 @@ if (isset($_POST['PlaceFO'])) {         //Placing Fruit / Veg order
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
-
-echo $AlertM;
 
 ?>
 

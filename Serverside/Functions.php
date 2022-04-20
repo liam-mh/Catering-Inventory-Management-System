@@ -9,11 +9,11 @@
 //******************************************************************************************************* 
 //***** Error Handling **********************************************************************************
 
-function checkError ($check, $name) {
+function checkError ($check, $name, $empty) {
 
-    //** check if input empty
-    if ($check == NULL) {
-        throw new Exception($name." must not be empty."); 
+    //** check if input empty if specified
+    if ($empty == TRUE) {
+        checkEmpty($check, $name);
     }
 
     //** check if input is only a number
@@ -29,6 +29,14 @@ function checkError ($check, $name) {
     }
 }
 
+function checkEmpty ($check, $name) {
+
+    //** check if input empty
+    if ($check == NULL || "") {
+        throw new Exception($name." must not be empty."); 
+    }  
+}
+
 //******************************************************************************************************* 
 //******************************************************************************************************* 
 
@@ -39,22 +47,11 @@ function checkError ($check, $name) {
 function addNew() {
 
     //******************** Error Handling ********************
-    //** check if input is only a number
-    //** check if input is a whole number
-    if (is_numeric($_POST['UnitPounds'])) {
-        if (is_float($_POST['UnitPounds'])) {
-        } else {throw new Exception("Pounds must be a whole number");}
-    } else {throw new Exception("Pounds must be a number.");}
-
-    if (is_numeric($_POST['UnitPence'])) {
-        if (is_float($_POST['UnitPence'])) {
-        } else {throw new Exception("Pence must be a whole number");}
-    } else {throw new Exception("Pence must be a number.");}
-
-    if (is_numeric($_POST['Threshold'])) {
-        if (is_float($_POST['UnitThreshold'])) {
-        } else {throw new Exception("Threshold must be a whole number");}
-    } else {throw new Exception("Threshold must be a number.");}
+    //** Arrays to check
+    $checkArray = [$_POST['UnitPounds'],$_POST['UnitPence'],$_POST['Threshold']]; 
+    $nameArray = ["Unit pounds","Unit pence","Threshold"];
+    //** Checking for errors
+    for ($i=0; $i<count($checkArray); $i++) {checkError($checkArray[$i], $nameArray[$i],TRUE);}
     //******************************************************** 
 
     //Unit price calculation
@@ -79,28 +76,18 @@ function addNew() {
 function updateSelected() {
 
     //******************** Error Handling ********************
-    //** check if input is only a number
-    //** check if input is a whole number
-     if (is_numeric($_POST['UpdateUnitPounds'])) {
-        if (is_float($_POST['UpdateUnitPounds'])) {
-        } else {throw new Exception("Update pounds must be a whole number");}
-    } else {throw new Exception("Update pounds value must be a number.");}
+    //** Arrays to check
+    //$checkArray = ["", $_POST['UpdateQuantity'], "", $_POST['Threshold'], $_POST['UpdateUnitPounds'], $_POST['UpdateUnitPence']];
+    //$nameArray =  ["", "Update in stock",        "", "Threshold",         "Unit pounds",              "Unit pence"];
+    //** Checking for errors
+    //for ($i=0; $i<count($checkArray); $i++) {checkError($checkArray[$i], $nameArray[$i], FALSE);}
 
-    if (is_numeric($_POST['UpdateUnitPence'])) {
-        if (is_float($_POST['UpdateUnitPence'])) {
-        } else {throw new Exception("Update pence must be a whole number");}
-    } else {throw new Exception("Update pence value must be a number.");}
-
-    if (is_numeric($_POST['UpdateThreshold'])) {
-        if (is_float($_POST['UpdateUnitThreshold'])) {
-        } else {throw new Exception("Update threshold must be a whole number");}
-    } else {throw new Exception("Update threshold value must be a number.");}
-
-    if (is_numeric($_POST['UpdateQuantity'])) {
-        if (is_float($_POST['UpdateQuantity'])) {
-        } else {throw new Exception("Update quantity must be a whole number");}
-    } else {throw new Exception("Update quantity value must be a number.");}
-    //******************************************************** 
+    //** Checking for errors
+    //checkError($_POST['UpdateQuantity'],   "Update in stock");
+    //checkError($_POST['UpdateUnitPounds'], "Update pounds");
+    //checkError($_POST['UpdateUnitPence'],  "Update pence");
+    //checkError($_POST['Threshold'],        "Update threshold",FALSE);
+    //********************************************************
 
     //Unit price calculation
     $pounds = $_POST['UpdateUnitPounds'];
@@ -149,12 +136,9 @@ function deleteSelected() {
 //Inserts used stock input into stock table
 function insertStock($SelectedItem) {
 
-    //******************** Error Handling ******************** 
-    //** check if input is only a number
-    if (is_numeric($_POST['UpdateUnitPounds'])) {
-    } else {
-        throw new Exception("Insert quantity value must be a number");
-    }
+    //******************** Error Handling ********************
+    //** Checking for errors
+    checkError($_POST['InsertQuantity'], "Insert used stock", FALSE);
     //******************************************************** 
 
     //Subtracting insert quantity
@@ -259,6 +243,12 @@ function getSupplier () {
 //Updates suppliers name and email
 function updateSupplier($c,$n,$e) {
 
+    //******************** Error Handling ********************
+    //** Checking for errors
+    checkEmpty($n, "Supplier name");
+    checkEmpty($e, "Supplier email");
+    //********************************************************
+
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 
        'UPDATE Supplier 
@@ -308,22 +298,11 @@ function getItemOrder ($c) {
 }
 
 //Adds user input quantity to order of below threshold item
-function addToOrder($UnitPrice) {
-    
-    //******************** Error Handling ******************** 
-    //** check if input not empty
-    if ($_POST['OrderQuantity'] == NULL) {
-        throw new Exception("Order quantity must contain a number to be added to the order"); 
-    //** check if input is only a number
-    } elseif(is_numeric($_POST['OrderQuantity'])) {
-    } else {
-        throw new Exception("Order quantity must be a number");
-    }
-    //** check if input is a whole number
-    if (is_float($_POST['OrderQuantity'])) {
-    } else {
-        throw new Exception("Order quantity must be a whole number");
-    }
+function addToOrder($UnitPrice, $Name) {
+
+    //******************** Error Handling ********************
+    //** Checking for errors
+    checkError($_POST['OrderQuantity'], $Name." order amount", TRUE);
     //******************************************************** 
 
     //Calculating total price of order
@@ -334,7 +313,7 @@ function addToOrder($UnitPrice) {
             SET Order_Quantity=:Quantity, Total=:Total 
             WHERE Item_Name=:ItemName';
     $stmt = $db->prepare($sql); 
-    $stmt->bindParam(':ItemName', $N, SQLITE3_TEXT);
+    $stmt->bindParam(':ItemName', $Name, SQLITE3_TEXT);
     $stmt->bindParam(':Quantity', $_POST['OrderQuantity'], SQLITE3_INTEGER);
     $stmt->bindParam(':Total',    $total, SQLITE3_INTEGER);
     $stmt->execute();
@@ -515,8 +494,6 @@ function OrderAD($category, $total, $PIO, $AD) {
 
     //Setting header
     header("Location:SupplierOrder.php?Order=$AD");
-
-    
 }
 
 //Updates Whole_Order table

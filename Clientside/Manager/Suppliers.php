@@ -1,8 +1,8 @@
 <?php 
 
 //error_reporting(0);
+$ErrorMessage = "";
 
-$NavS = "-selected";
 include("../../Serverside/Sessions.php");
 include("../../Serverside/Functions.php");
 
@@ -18,9 +18,13 @@ if (!isset($_SESSION['Username'])) {
 $supplier = getSupplier(); //Getting all supplier info
 
 //Updating suppliers
-if (isset($_POST['DApply'])) {updateSupplier("Dairy",      $_POST['DN'],$_POST['DE']);}
-if (isset($_POST['MApply'])) {updateSupplier("Meat / Fish",$_POST['MN'],$_POST['ME']);}
-if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['FE']);}
+try {
+    if (isset($_POST['DApply'])) {updateSupplier("Dairy",      $_POST['DN'],$_POST['DE']);}
+    if (isset($_POST['MApply'])) {updateSupplier("Meat / Fish",$_POST['MN'],$_POST['ME']);}
+    if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['FE']);}
+} catch(exception $e) {
+    $ErrorMessage = $e->getMessage();
+}
 
 //-------------------------------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------------------------------
@@ -30,6 +34,13 @@ if (isset($_POST['FApply'])) {updateSupplier("Fruit / Veg",$_POST['FN'],$_POST['
 <body>
     <?php nav("supplier");?>
     <div class="container">
+
+    <!-- ALERT: ERROR MESSAGE -->
+    <?php if ($ErrorMessage != ""): ?>
+        <div class="alert alert-danger" role="alert" style="font-weight:bold; width:fit-content">
+            ERROR MESSAGE: <?php echo $ErrorMessage ?>
+        </div>
+    <?php endif; ?>
 
     <div style="text-align:center">  
         <div class="w1-box">
