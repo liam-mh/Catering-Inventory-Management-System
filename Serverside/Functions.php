@@ -9,7 +9,7 @@
 //******************************************************************************************************* 
 //***** Error Handling **********************************************************************************
 
-function checkError ($check, $name, $empty) {
+function checkError($check, $name, $empty) {
 
     //** check if input empty if specified
     if ($empty == TRUE) {
@@ -46,13 +46,14 @@ function checkEmpty ($check, $name) {
 //Adds new item to Stock table
 function addNew() {
 
+    /* ERROR HANDLING NOT WORKING
     //******************** Error Handling ********************
     //** Arrays to check
     $checkArray = [$_POST['UnitPounds'],$_POST['UnitPence'],$_POST['Threshold']]; 
-    $nameArray = ["Unit pounds","Unit pence","Threshold"];
     //** Checking for errors
-    for ($i=0; $i<count($checkArray); $i++) {checkError($checkArray[$i], $nameArray[$i],TRUE);}
+    for ($i=0; $i<count($checkArray); $i++) {checkError($checkArray[$i], "Number inputs",TRUE);}
     //******************************************************** 
+    */
 
     //Unit price calculation
     $pounds = $_POST['UnitPounds'];
@@ -75,19 +76,14 @@ function addNew() {
 //Updates details of selected item in Stock table
 function updateSelected() {
 
+    /* ERROR HANDLING NOT WORKING
     //******************** Error Handling ********************
     //** Arrays to check
-    //$checkArray = ["", $_POST['UpdateQuantity'], "", $_POST['Threshold'], $_POST['UpdateUnitPounds'], $_POST['UpdateUnitPence']];
-    //$nameArray =  ["", "Update in stock",        "", "Threshold",         "Unit pounds",              "Unit pence"];
+    $checkArray = [$_POST['UpdateQuantity'], $_POST['Threshold'], $_POST['UpdateUnitPounds'], $_POST['UpdateUnitPence']];
     //** Checking for errors
-    //for ($i=0; $i<count($checkArray); $i++) {checkError($checkArray[$i], $nameArray[$i], FALSE);}
-
-    //** Checking for errors
-    //checkError($_POST['UpdateQuantity'],   "Update in stock");
-    //checkError($_POST['UpdateUnitPounds'], "Update pounds");
-    //checkError($_POST['UpdateUnitPence'],  "Update pence");
-    //checkError($_POST['Threshold'],        "Update threshold",FALSE);
+    for ($i=0; $i<count($checkArray); $i++) {checkError($checkArray[$i], "Number inputs", FALSE);}
     //********************************************************
+    */
 
     //Unit price calculation
     $pounds = $_POST['UpdateUnitPounds'];
@@ -188,7 +184,7 @@ function insertStock($SelectedItem) {
 //----- GETTING FROM STOCK TABLE ------------------------------------------------------------------------
 
 //All stock by name
-function getCurrentStock () {
+function getCurrentStock() {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Stock ORDER BY Item_Name ASC');
     while ($row=$rows->fetchArray()) {
@@ -197,7 +193,7 @@ function getCurrentStock () {
     return $rows_array;
 }
 //All stock by category
-function getCurrentStockByCat () {
+function getCurrentStockByCat() {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Stock ORDER BY Category ASC');
     while ($row=$rows->fetchArray()) {
@@ -206,7 +202,7 @@ function getCurrentStockByCat () {
     return $rows_array;
 }
 //All stock thats below below threshold
-function getCurrentStockBelow () {
+function getCurrentStockBelow() {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Stock WHERE Quantity < Threshold ORDER BY Item_Name ASC');
     while ($row=$rows->fetchArray()) {
@@ -231,7 +227,7 @@ function getSelectedStock($selected) {
 //----- SUPPLIERS ---------------------------------------------------------------------------------------
 
 //Getting all supplier detials
-function getSupplier () {
+function getSupplier() {
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $rows = $db->query('SELECT * FROM Supplier');
     while ($row=$rows->fetchArray()) {
@@ -283,7 +279,7 @@ function getLoggedInSupplierCat($SupplierName) {
 //----- ORDERS & ORDER ITEMS ----------------------------------------------------------------------------
 
 //Getting low quantity Item_Order in supplier category
-function getItemOrder ($c) {
+function getItemOrder($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Placed IS NOT 1';
@@ -300,10 +296,12 @@ function getItemOrder ($c) {
 //Adds user input quantity to order of below threshold item
 function addToOrder($UnitPrice, $Name) {
 
+    /* ERROR HANDLING NOT WORKING
     //******************** Error Handling ********************
     //** Checking for errors
     checkError($_POST['OrderQuantity'], $Name." order amount", TRUE);
     //******************************************************** 
+    */
 
     //Calculating total price of order
     $total = $UnitPrice * $_POST['OrderQuantity'];
@@ -320,7 +318,7 @@ function addToOrder($UnitPrice, $Name) {
 }
 
 //Getting low quantity Item_Order in supplier category
-function getAddedItemOrder ($c) {
+function getAddedItemOrder($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Order_Quantity IS NOT NULL AND PLACED IS NOT 1';
@@ -335,7 +333,7 @@ function getAddedItemOrder ($c) {
 }
 
 //Getting Placed low quantity Item_Order in supplier category
-function getPlacedItemOrder ($c) {
+function getPlacedItemOrder($c) {
     
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');
     $sql = 'SELECT * FROM Item_Order WHERE Category = :Cat AND Order_Quantity IS NOT NULL AND Placed = 1';
@@ -350,7 +348,7 @@ function getPlacedItemOrder ($c) {
 }
 
 //Total of placed items order
-function TotalPIO ($c) {
+function TotalPIO($c) {
     
     $g = getPlacedItemOrder($c);
     $sum = 0;
@@ -361,7 +359,7 @@ function TotalPIO ($c) {
     return $sum;
 }
 //Total of items order
-function TotalIO ($c) {
+function TotalIO($c) {
     
     $g = getAddedItemOrder($c);
     $sum = 0;
@@ -374,7 +372,7 @@ function TotalIO ($c) {
 
 //places order from Item_Order to Whole_Order and updates Placed to 1
 include("OrderPDF.php");
-function placeOrder ($c,$t) {
+function placeOrder($c,$t) {
 
     //updating Order_Item table
     $db = new SQLite3('/Applications/MAMP/db/IMS.db');

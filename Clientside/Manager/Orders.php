@@ -1,6 +1,6 @@
 <?php 
 
-//error_reporting(0);
+error_reporting(0);
 $ErrorMessage = "";
 
 include("../../Serverside/Sessions.php");
@@ -20,7 +20,6 @@ if (!isset($_SESSION['Username'])) {
 //----- GETTING FROM DB AND NAME VARIABLES --------------------------------------------------------------
 
 $supplier = getSupplier();                   //Getting all suppliers info
-
 $selected = $_GET['Selected'];               //Selected item
 $SelectedItem = getSelectedStock($selected); //getting all info for selected item
 $N = $SelectedItem[0][0];                    //Selected item name

@@ -50,12 +50,8 @@ if (isset($_POST['submit'])) {
                         <input type="submit" value="SUPPLIER LOGIN" class="w1-tab-unselected" name="sLogin">
                     </form>  
                 </div>
-                <?php 
-                    if (isset($_POST['sLogin'])) {header('Location:../Supplier/SupplierLogin.php');}
-                ?>
+                <?php if (isset($_POST['sLogin'])) {header('Location:../Supplier/SupplierLogin.php');}?>
             </div>   
-
-            <!-- Apply Tab-->
             
 
             <!-- Logins -->

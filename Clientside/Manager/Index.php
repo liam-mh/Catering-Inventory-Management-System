@@ -1,6 +1,6 @@
 <?php 
 
-//error_reporting(0);
+error_reporting(0);
 $ErrorMessage = "";
 
 include("../../Serverside/Sessions.php");
@@ -43,6 +43,7 @@ if (isset($_POST['add'])) {
 
     //if all fields filled in try adding to Stock table
     if ($allFields == "yes") {
+
         try {
             addNew();
         } catch(exception $e) {
