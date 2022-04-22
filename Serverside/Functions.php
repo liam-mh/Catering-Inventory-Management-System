@@ -132,10 +132,12 @@ function deleteSelected() {
 //Inserts used stock input into stock table
 function insertStock($SelectedItem) {
 
+    /* ERROR HANDLING NOT WORKING
     //******************** Error Handling ********************
     //** Checking for errors
     checkError($_POST['InsertQuantity'], "Insert used stock", FALSE);
     //******************************************************** 
+    */
 
     //Subtracting insert quantity
     $CurrentQ = $SelectedItem[0][4];
